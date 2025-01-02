@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import YearRecordModal from '@/components/YearRecordModal';
 
 const Records: React.FC = () => {
-  const currentYear = new Date().getFullYear();
+  const currentYear = 2024;
   const years = Array.from({ length: 30 }, (_, i) => currentYear + i);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
 
