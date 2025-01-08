@@ -52,9 +52,9 @@ const DataControls = () => {
     <div className="flex gap-4">
       <Button 
         onClick={handleExport}
-        className="flex items-center gap-2"
+        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
       >
-        <Download className="h-4 w-4" />
+        <Download className="h-4 w-4 "  />
         Export Data
       </Button>
 
