@@ -21,9 +21,9 @@
 <ins>**HOW TO USE:** _(s/o ALostTraveler24 on Reddit)_</ins>
 
 1. First you need to verify that you have [`node.js`](https://nodejs.org/en/download/package-manager/current) on your device. You can install it from the linked website, but if you want to check if you have it already, load up your device's terminal/console and type in `node -v`
-2. Once that's done, you want to clone the repository. For that you need git and then you can either use the command prompt `git clone <repo url>` or you can download Github Desktop which might be a bit easier if you are new to git and don't use it at all other than for this.
-3. Once the repo is cloned, you need to use the terminal again. Go into the folder containing the cloned repo, `cd <folder_path>` and then run `npm install --force`. This will install the dependencies.
-4. Once everything is installed, in the same folder, run `npm run dev` and the program will start. Then navigate in a browser (unless it auto-loads for you) to `localhost:3000`
+2. Once that's done, you want to clone the repository. For that you can click on the green code button and click "Download as ZIP".  Or you can use git and you can either use the command prompt `git clone <repo url>` or you can download Github Desktop which might be a bit easier if you are new to git and don't use it at all other than for this.
+3. Once the repo is cloned, you need to use the terminal again. Open Command Prompt, and go into the folder containing the cloned repo, `cd <folder_path>` and then run `npm install`. This will install the dependencies.
+4. Once everything is installed, in the same folder, run `npm run electron-dev` and the program will start.`
 
    I think that's everything, when you're done with the app, you should probably end the process in the terminal `ctrl+c` should do the trick and then everytime you want to use it again, just run the last step again and it should load up with the relevant data.
 
