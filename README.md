@@ -15,7 +15,7 @@
 11. Season Stats - Buttons for all 30 years. Stats tracked are Record, Conference Record, Points For, Points Against, Bowl Game & Result, National Champion, Heisman Record, and Schedule w/ Opponent and Result with Score.
 12. Player Awards - Selectable player awards tracked on a year-to-year basis for easy viewabilty in the future.
 13. Trophy Case - Enterable Trophies for users to track National Championships, Bowl Games, Conference Championships and Rivalry Games.
-14. Tools - Recruiting tools to give overall estimates, if you should Hard Sell or not, and a Random Name Generator.
+14. Tools - Recruiting tools to give overall estimates, if you should Hard Sell or not, a Random Name Generator, and an Import / Export function for saving progress!
 
 
 <ins>**HOW TO USE:** _(s/o ALostTraveler24 on Reddit)_</ins>
