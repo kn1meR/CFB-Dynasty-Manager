@@ -1,9 +1,8 @@
-// src/components/RecruitingCalculator.tsx
 import React, { useState, useEffect } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Calculator } from 'lucide-react';
 
 const grades = [
   { label: 'A+', value: 13 },
@@ -27,7 +26,7 @@ const RecruitingCalculator: React.FC = () => {
   const [grade3, setGrade3] = useState<number | null>(null);
   const [result, setResult] = useState<string>('');
 
-  useEffect(() => {
+  const calculateResult = () => {
     if (grade1 !== null && grade2 !== null && grade3 !== null) {
       const total = grade1 + grade2 + grade3;
       if (total <= 17) {
@@ -37,10 +36,8 @@ const RecruitingCalculator: React.FC = () => {
       } else {
         setResult('SELL!');
       }
-    } else {
-      setResult('');
     }
-  }, [grade1, grade2, grade3]);
+  };
 
   const resetGrades = () => {
     setGrade1(null);
@@ -88,10 +85,18 @@ const RecruitingCalculator: React.FC = () => {
           </Select>
         ))}
       </div>
+
       <div className="flex justify-between items-center">
-        <Button onClick={resetGrades} variant="outline" className="flex items-center">
-          <RefreshCw className="mr-2 h-4 w-4" /> Reset Grades
-        </Button>
+        
+          <Button onClick={calculateResult} className="bg-blue-600 hover:bg-blue-700">
+            <Calculator className="mr-2 h-4 w-4" /> Calculate
+          </Button>
+          <Button onClick={resetGrades} variant="outline" className="flex items-center">
+            <RefreshCw className="mr-2 h-4 w-4" /> Reset
+          </Button>
+        </div>
+
+
         {result && (
           <Card>
             <CardContent className="pt-6">
@@ -102,7 +107,6 @@ const RecruitingCalculator: React.FC = () => {
           </Card>
         )}
       </div>
-    </div>
   );
 };
 
