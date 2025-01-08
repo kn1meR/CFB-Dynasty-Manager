@@ -65,7 +65,7 @@ const PlayerNameGenerator: React.FC = () => {
               min={1}
               max={MAX_NAMES}
             />
-            <Button onClick={generateNames}>Generate Names</Button>
+            <Button onClick={generateNames} className="bg-blue-600 hover:bg-blue-700 ">Generate Names</Button>
           </div>
         </div>
         <div className="space-y-2 mt-4">
