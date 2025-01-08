@@ -20,7 +20,8 @@ const Navigation: React.FC = memo(() => {
     { name: 'Player Stats', path: '/player-stats' },
     { name: 'Season Stats', path: '/records' },
     { name: 'Player Awards', path: '/awards' },
-    { name: 'Trophy Case', path: '/trophy-case' }
+    { name: 'Trophy Case', path: '/trophy-case' },
+    { name: 'Tools', path: '/tools' }
   ];
 
   return (
