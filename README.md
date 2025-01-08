@@ -32,7 +32,7 @@
 
   Will not build into standalone app properly.  
   
-  After installing node and all dependencies in `package.json`, running `npm run dev` in Terminal runs the application properly as intended.
+  After installing node and all dependencies in `package.json`, running `npm run electron-dev` in Terminal runs the application properly as intended.
 
 
 ![image](https://github.com/user-attachments/assets/5f81576e-aa6a-4d81-84c6-4c947c35908d)
