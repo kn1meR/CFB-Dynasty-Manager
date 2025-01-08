@@ -27,7 +27,7 @@
 5. When you're done using the app, you should close the app and end the process by pressing `ctrl+c` in the Terminal.
 6. Whenever you want to run the app again, just naviate into the folder by typing `cd <folder_path>` in the Command Prompt, and type `npm run electron-dev`.
 
-   *BONUS TIP - If you want to create a desktop shotcut to automate the process, you can make a .bat file and enter `cd <folder_path> npm run electron-dev` and then save and use that as a psuedo-shortcut.*
+   * *BONUS TIP - If you want to create a desktop shotcut to automate the process, you can make a .bat file and enter `cd <folder_path> npm run electron-dev` and then save and use that as a psuedo-shortcut.*
 
 
 
