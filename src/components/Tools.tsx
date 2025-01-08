@@ -9,6 +9,7 @@ import { Calculator, FileSpreadsheet, BarChart3, UserPlus } from 'lucide-react';
 import RecruitingCalculator from './RecruitingCalculator';
 import PlayerNameGenerator from './PlayerNameGenerator';
 import RecruitPredictor from './RecruitingPredictor';
+import DataControls from './DataControls';
 
 
 const Tools: React.FC = () => {
@@ -41,6 +42,13 @@ const Tools: React.FC = () => {
             <PlayerNameGenerator />
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader className="text-xl justify-between font-semibold">Import / Export</CardHeader>
+         <CardContent>
+            <DataControls />
+          </CardContent>
+      </Card>
 
         {/* ... other tool cards ... */}
       </div>
