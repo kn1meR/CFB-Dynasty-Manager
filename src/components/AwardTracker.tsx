@@ -101,19 +101,7 @@ const AwardTracker: React.FC = () => {
         <CardHeader className="text-xl font-semibold">
           <div className="flex justify-between items-center">
             <span>Add New Award for Year: {selectedYear}</span>
-            <Select
-              value={selectedYear.toString()}
-              onValueChange={(value) => setSelectedYear(parseInt(value))}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select Year" />
-              </SelectTrigger>
-              <SelectContent>
-                {Array.from({ length: 5 }, (_, i) => currentYear + i).map(year => (
-                  <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            
           </div>
         </CardHeader>
         <CardContent>
