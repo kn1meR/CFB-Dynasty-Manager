@@ -61,6 +61,9 @@ const TeamHome: React.FC = () => {
       setSchedule(currentYear, currentSchedule);
       const calculatedStats = calculateStats(currentSchedule);
       setYearStats(currentYear, calculatedStats);
+      
+      // Get existing trophies before year change
+      const existingTrophies = JSON.parse(localStorage.getItem('allTrophies') || '[]');
 
       let yearRecord = generateYearRecord(currentYear, yearStats, currentSchedule);
 
@@ -96,9 +99,12 @@ const TeamHome: React.FC = () => {
         bowlResult: '',
       });
       
-    // Reset Top 25 rankings
-    const emptyTop25 = Array.from({length: 25}, (_, i) => ({ rank: i + 1, name: '', previousRank: null }));
-    localStorage.setItem('top25Rankings', JSON.stringify(emptyTop25));
+      // Reset Top 25 rankings
+      const emptyTop25 = Array.from({length: 25}, (_, i) => ({ rank: i + 1, name: '', previousRank: null }));
+      localStorage.setItem('top25Rankings', JSON.stringify(emptyTop25));
+      
+      // Restore trophies after year change
+      localStorage.setItem('allTrophies', JSON.stringify(existingTrophies));
   
     router.refresh();
     toast.success('Year ended successfully. Welcome to the new season!');
