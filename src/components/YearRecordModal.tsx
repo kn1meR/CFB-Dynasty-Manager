@@ -196,7 +196,7 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
                     className="col-span-2"
                   />
                 </div>
-              </div>
+              
               <div className="grid grid-cols-3 items-center gap-4">
                   <label htmlFor="classRanking" className="text-right">Recruiting Class Rank:</label>
                   <Input
@@ -205,6 +205,7 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
                     onChange={(e) => setRecord({ ...record, recruitingClassPlacement: e.target.value })}
                     className="col-span-2"
                   />
+                </div>
                 </div>
             </ScrollArea>
           </div>
