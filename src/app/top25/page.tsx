@@ -1,14 +1,14 @@
-// src/app/rankings/page.tsx
 import dynamic from 'next/dynamic'
 import { Suspense } from 'react'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
 
 const Top25Rankings = dynamic(() => import('@/components/Top25Rankings'), {
-  loading: () => <p>Loading...</p>,
+  loading: () => <LoadingSpinner fullPage />,
 })
 
 export default function RankingsPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<LoadingSpinner fullPage />}>
       <Top25Rankings />
     </Suspense>
   )
