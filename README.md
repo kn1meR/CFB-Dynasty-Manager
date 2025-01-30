@@ -18,7 +18,7 @@
 14. Tools - Recruiting tools to give overall estimates, if you should Hard Sell or not, a Random Name Generator, and an Import / Export function for saving progress!
 
 
-<ins>**HOW TO USE:** _(s/o ALostTraveler24 on Reddit)_</ins>
+<ins>**HOW TO USE:**</ins>
 
 1. First you need to verify that you have [`node.js`](https://nodejs.org/en/download/package-manager/current) on your device. You can install it from the linked website, but if you want to check if you have it already, load up your device's terminal/console and type in `node -v`
 2. Once that's done, you want to download/clone the repository. For that you can click on the green code button and click "Download as ZIP".  If using this way, then extract `CFB25-Dynasty-Manager-main` from the .ZIP file and move to your Desktop.  Or you can use git and you can either use the command prompt `git clone <repo url>` or download Github Desktop which might be a bit easier if you are new to git and don't use it at all other than for this.
@@ -35,6 +35,8 @@
   
   After installing node and all dependencies in `package.json`, running `npm run electron-dev` in Terminal runs the application properly as intended.
 
+
+<ins>**SCREENSHOTS:**</ins>
 
 ![image](https://github.com/user-attachments/assets/e3de4fd8-9c70-42c8-8ab2-381084846c07)
 
