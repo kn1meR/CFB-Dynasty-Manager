@@ -3,6 +3,7 @@ import { ThemeProvider } from 'next-themes'
 import { Inter } from 'next/font/google'
 import Navigation from '@/components/Navigation'
 import './globals.css'
+import { Toaster } from 'react-hot-toast';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -14,6 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100`}>
+        <Toaster />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <div className="min-h-screen flex flex-col">
             <Navigation />
