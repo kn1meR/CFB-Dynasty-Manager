@@ -13,6 +13,7 @@ import { DraftedPlayer, Recruit, Transfer } from '@/types/playerTypes';
 import { Award } from '@/types/statTypes';
 import { YearRecord, Game, YearStats } from '@/types/yearRecord';
 import { getRecruits, getTransfers, getYearAwards, getYearRecord } from '@/utils/localStorage';
+import { notifySuccess, notifyError, MESSAGES } from '@/utils/notification-utils';
 
 interface YearRecordModalProps {
   year: number;
@@ -78,6 +79,7 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
     }
   
     localStorage.setItem('yearRecords', JSON.stringify(records));
+    notifySuccess(MESSAGES.SAVE_SUCCESS);
     onClose();
   };
 
@@ -105,6 +107,7 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
   const removeDraftedPlayer = (index: number) => {
     const updatedPlayersDrafted = record.playersDrafted.filter((_, i) => i !== index);
     setRecord({ ...record, playersDrafted: updatedPlayersDrafted });
+    notifySuccess(MESSAGES.SAVE_SUCCESS);
   };
 
   return (

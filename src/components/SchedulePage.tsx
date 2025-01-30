@@ -14,6 +14,7 @@ import { toast } from 'react-hot-toast';
 import { fbsTeams } from '@/utils/fbsTeams';
 import { fcsTeams } from '@/utils/fcsTeams';
 import { Game } from '@/types/yearRecord';
+import { notifySuccess, notifyError, MESSAGES } from '@/utils/notification-utils';
 
 const results = ['Win', 'Loss', 'Tie', 'Bye', 'N/A'] as const;
 const locations = ['@', 'vs', 'neutral', ' '] as const;
@@ -69,10 +70,9 @@ const SchedulePage: React.FC = () => {
       const calculatedStats = calculateStats(currentSchedule);
       const currentStats = getYearStats(currentYear);
       setYearStats(currentYear, { ...currentStats, ...calculatedStats });
-      toast.success('Schedule saved successfully.');
+      notifySuccess(MESSAGES.SAVE_SUCCESS);
     } catch (error) {
-      console.error('Error saving schedule:', error);
-      toast.error('Failed to save schedule. Please try again.');
+      notifyError(MESSAGES.SAVE_ERROR);
     }
   };
 

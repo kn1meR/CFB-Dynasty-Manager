@@ -10,6 +10,7 @@ import useLocalStorage from '@/hooks/useLocalStorage';
 import { capitalizeName } from '@/utils';
 import { Recruit } from '@/types/playerTypes';
 import { generalPositions } from '@/types/playerTypes';
+import { notifySuccess, notifyError, MESSAGES } from '@/utils/notification-utils';
 
 const potentials = ['Elite', 'Star', 'Impact', 'Normal'];
 const starOptions = ['5', '4', '3', '2', '1'];
@@ -38,6 +39,7 @@ const RecruitingClassTracker: React.FC = () => {
     };
     setAllRecruits([...allRecruits, recruitToAdd]);
     setNewRecruit({ name: '', stars: '', position: '', rating: '', potential: '' });
+    notifySuccess(MESSAGES.SAVE_SUCCESS);
   };
 
   const startEditing = (recruit: Recruit) => {
@@ -53,6 +55,7 @@ const RecruitingClassTracker: React.FC = () => {
     ));
     setEditingId(null);
     setNewRecruit({ name: '', stars: '', position: '', rating: '', potential: '' });
+    notifySuccess(MESSAGES.SAVE_SUCCESS);
   };
 
   const cancelEdit = () => {
@@ -62,6 +65,7 @@ const RecruitingClassTracker: React.FC = () => {
 
   const removeRecruit = (id: number) => {
     setAllRecruits(allRecruits.filter(recruit => recruit.id !== id));
+    notifySuccess(MESSAGES.SAVE_SUCCESS);
   };
 
   return (

@@ -35,7 +35,6 @@ const Tools: React.FC = () => {
 
         <Card>
           <CardHeader className="text-xl font-semibold flex items-center">
-            
             Player Name Generator
           </CardHeader>
           <CardContent>

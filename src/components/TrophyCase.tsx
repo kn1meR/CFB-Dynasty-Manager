@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import useLocalStorage from '@/hooks/useLocalStorage';
+import { notifySuccess, notifyError, MESSAGES } from '@/utils/notification-utils';
 
 interface Trophy {
   id: number;
@@ -32,10 +33,12 @@ const TrophyCase: React.FC = () => {
       type: 'National Championship',
       name: '',
     });
+    notifySuccess(MESSAGES.SAVE_SUCCESS);
   };
 
   const removeTrophy = (id: number) => {
     setAllTrophies(allTrophies.filter(trophy => trophy.id !== id));
+    notifySuccess(MESSAGES.SAVE_SUCCESS);
   };
 
   return (

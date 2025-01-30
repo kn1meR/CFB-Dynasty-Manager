@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ArrowUp, ArrowDown, ChevronUp, ChevronDown } from 'lucide-react';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { fbsTeams } from '@/utils/fbsTeams';
+import { notifySuccess, notifyError, MESSAGES } from '@/utils/notification-utils';
 
 interface RankedTeam {
   rank: number;
@@ -24,6 +25,7 @@ const Top25Rankings: React.FC = () => {
     const newRankings = [...rankings];
     newRankings[index] = { ...newRankings[index], name: teamName === "unranked" ? "" : teamName };
     setRankings(newRankings);
+    notifySuccess(MESSAGES.SAVE_SUCCESS);
   };
 
   const updateRankings = () => {
@@ -33,6 +35,7 @@ const Top25Rankings: React.FC = () => {
       rank: index + 1,
     }));
     setRankings(updatedRankings);
+    notifySuccess(MESSAGES.SAVE_SUCCESS);
   };
 
   const moveTeam = (fromIndex: number, toIndex: number) => {
@@ -41,6 +44,7 @@ const Top25Rankings: React.FC = () => {
     const [movedTeam] = newRankings.splice(fromIndex, 1);
     newRankings.splice(toIndex, 0, movedTeam);
     setRankings(newRankings.map((team, index) => ({ ...team, rank: index + 1 })));
+    notifySuccess(MESSAGES.SAVE_SUCCESS);
   };
 
   const renderRankingChange = (team: RankedTeam) => {

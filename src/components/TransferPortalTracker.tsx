@@ -12,6 +12,7 @@ import { fbsTeams } from '@/utils/fbsTeams';
 import { Transfer } from '@/types/playerTypes';
 import { getTransfers } from '@/utils/localStorage';
 import { generalPositions } from '@/types/playerTypes';
+import { notifySuccess, notifyError, MESSAGES } from '@/utils/notification-utils';
 
 const starOptions = ['5', '4', '3', '2', '1'];
 
@@ -45,6 +46,7 @@ const TransferPortalTracker: React.FC = () => {
       transferDirection: 'From',
       school: ''
     });
+    notifySuccess(MESSAGES.SAVE_SUCCESS);
   };
 
   const startEditing = (transfer: Transfer) => {
@@ -71,6 +73,7 @@ const TransferPortalTracker: React.FC = () => {
       transferDirection: 'From',
       school: ''
     });
+    notifySuccess(MESSAGES.SAVE_SUCCESS);
   };
 
   const cancelEdit = () => {
@@ -86,6 +89,7 @@ const TransferPortalTracker: React.FC = () => {
 
   const removeTransfer = (id: number) => {
     setAllTransfers(allTransfers.filter(transfer => transfer.id !== id));
+    notifySuccess(MESSAGES.SAVE_SUCCESS);
   };
 
   return (

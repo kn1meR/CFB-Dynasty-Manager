@@ -12,6 +12,7 @@ import { validateName, validateRating, validatePosition } from '@/utils/validati
 import { toast } from 'react-hot-toast';
 import RosterImageUpload from './RosterImageUpload';
 import { defensivePositions, offensePositions, positions, specialTeamsPositions } from '@/types/playerTypes';
+import { notifySuccess, notifyError, MESSAGES } from '@/utils/notification-utils';
 import { Label } from './ui/label';
 
 interface Player {
@@ -159,6 +160,7 @@ const Roster: React.FC = () => {
     ));
     setEditingId(null);
     setNewPlayer({jerseyNumber: '', name: '', position: '', year: '', rating: '', devTrait: 'Normal', notes: '' });
+    notifySuccess(MESSAGES.SAVE_SUCCESS);
   };
 
   const cancelEdit = () => {
@@ -168,6 +170,7 @@ const Roster: React.FC = () => {
 
   const removePlayer = (id: number) => {
     setPlayers(players.filter(player => player.id !== id));
+    notifySuccess(MESSAGES.SAVE_SUCCESS);
   };
 
   const validatePlayer = (player: Omit<Player, 'id'>): boolean => {

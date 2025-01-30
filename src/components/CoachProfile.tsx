@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Label } from '@/components/ui/label';
 import { User, School, Calendar } from 'lucide-react';
 import { fbsTeams } from '@/utils/fbsTeams';
+import { notifySuccess, notifyError, MESSAGES } from '@/utils/notification-utils';
 
 const CoachProfile = () => {
   const [profile, setProfile] = useState({ coachName: '', schoolName: '', currentYear: 2024 });
@@ -25,6 +26,7 @@ const CoachProfile = () => {
   const handleSave = () => {
     Object.entries(profile).forEach(([key, value]) => localStorage.setItem(key, value.toString()));
     setIsEditing(false);
+    notifySuccess(MESSAGES.SAVE_SUCCESS);
   };
 
   const handleReset = () => {
