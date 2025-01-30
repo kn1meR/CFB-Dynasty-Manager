@@ -1,17 +1,16 @@
 <ins>**FEATURES:**</ins>
 
-1. Customizable Coach and School Name.
+1. Set Coach Name, School Name, and Year.
 2. Application Data Reset - ***USE CAUTIOUSLY!*** - Resets all application data and wipes any previously entered data/information.
 3. Dark & Light Mode.
 4. Team Dashboard - See relevant team data at a quick glance.
 5. Schedule - Win/Loss/Tie and Score Tracker. Will automatically update record and points for/against in team dashboard & year stats.
 6. Top 25 - Allows for user input of the Top 25 teams week by week.  Will show movement of teams via green and red arrows. 
 7. Roster - Allows for roster input with jersey #, name, position, year, overall, dev. trait and notes. sortable by all fields (except notes).
-   
-   **NEW:** **UPLOAD SCREENSHOTS TO HAVE ROSTER AUTO ADDED** 
+   **BETA:** **UPLOAD SCREENSHOTS TO HAVE ROSTER AUTO ADDED** 
 8. Recruiting Class Tracker - Enter recruits' name, star rating, position, rating, and potential. Automatically tracked and stored year over year for easy viewability in the future.
 9. Transfer Class Tracker - Enter transfers' name, star rating, position, transfer direction(To/From), and potential. Automatically tracked and stored year over year for easy viewability in the future.
-10. Player Stats - Track stats for players by year.  See Game, Season, or Overall records for Offense, Defense, or Special Teams.  
+10. Player Stats - Track stats for players by year.  See Season or Career stats for Offense, Defense, or Special Teams.  
 11. Season Stats - Buttons for all 30 years. Stats tracked are Record, Conference Record, Points For, Points Against, Bowl Game & Result, National Champion, Heisman Record, and Schedule w/ Opponent and Result with Score.
 12. Player Awards - Selectable player awards tracked on a year-to-year basis for easy viewabilty in the future.
 13. Trophy Case - Enterable Trophies for users to track National Championships, Bowl Games, Conference Championships and Rivalry Games.
@@ -31,29 +30,33 @@
 
 
 
-<ins>**ISSUES:**</ins>
+<ins>**COMMON ISSUES:**</ins>
   
   After installing node and all dependencies in `package.json`, running `npm run electron-dev` in Terminal runs the application properly as intended.
 
 
-![image](https://github.com/user-attachments/assets/5f81576e-aa6a-4d81-84c6-4c947c35908d)
+![image](https://github.com/user-attachments/assets/e3de4fd8-9c70-42c8-8ab2-381084846c07)
 
-![image](https://github.com/user-attachments/assets/d14b1463-ca1e-4595-b515-456fec421223)
+![image](https://github.com/user-attachments/assets/994b250d-2494-40d5-b93e-938ca07bebaa)
 
-![image](https://github.com/user-attachments/assets/c5755902-f864-4f11-8790-b1a28f3fb3bd)
+![image](https://github.com/user-attachments/assets/d3b89b1d-bbf4-4b36-a5cb-7f3d4a15939a)
 
-![image](https://github.com/user-attachments/assets/dd292162-40d2-4e0d-84cd-68c2e4a9577f)
+![image](https://github.com/user-attachments/assets/abd7e7e4-b86d-4fc7-957b-1ba8d111965b)
 
-![image](https://github.com/user-attachments/assets/aa6c87a7-55cc-4c1b-b754-81daaf503804)
+![image](https://github.com/user-attachments/assets/f87455ef-2838-4aeb-9a40-1a7a7be31e9b)
 
-![image](https://github.com/user-attachments/assets/6fa8ecd1-d653-47fb-9018-a3b2cb98976d)
+![image](https://github.com/user-attachments/assets/ccea5c16-af54-413d-bbee-2ca60136759b)
 
-![image](https://github.com/user-attachments/assets/014252ff-94f6-49fc-ab1c-55d3a2d5ac16)
+![image](https://github.com/user-attachments/assets/e7df8c87-37bc-4afc-b9c1-0613d40183d8)
 
-![image](https://github.com/user-attachments/assets/d7a992e7-27b0-48b0-bb49-bf2e3162cc06)
+![image](https://github.com/user-attachments/assets/be78b5a3-55ee-403e-bbc1-91a80e02687d)
 
-![image](https://github.com/user-attachments/assets/ac4231aa-a26d-484b-8470-5586da00a5fd)
+![image](https://github.com/user-attachments/assets/272e6824-b6b5-4243-80ae-2aed712718f5)
 
-![image](https://github.com/user-attachments/assets/5a4a9ef9-3d71-4521-befa-fd6b9a723aa6)
+![image](https://github.com/user-attachments/assets/2a2512f7-7d3f-4786-9940-6cdb46c0b6d8)
 
-![image](https://github.com/user-attachments/assets/7bcb8bd6-bc1b-4df4-8353-7c53729f7d0f)
+![image](https://github.com/user-attachments/assets/28fb8b42-0f9f-42f2-ac3e-3b285b9a6413)
+
+![image](https://github.com/user-attachments/assets/5570c97b-4128-4139-ab15-84cfb4a6c8f3)
+
+
