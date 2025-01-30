@@ -290,8 +290,8 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
                 <Table>
                   <thead>
                     <tr>
-                      <th>Name</th>
                       <th>Stars</th>
+                      <th>Name</th>
                       <th>Position</th>
                       <th>Rating</th>
                       <th>Potential</th>
@@ -300,8 +300,8 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
                   <tbody>
                     {record.recruits?.map((recruit, index) => (
                       <tr key={index}>
+                        <td style={{ textAlign: 'center' }}>{recruit.stars} ★</td>
                         <td style={{ textAlign: 'center' }}>{recruit.name}</td>
-                        <td style={{ textAlign: 'center' }}>{recruit.stars}</td>
                         <td style={{ textAlign: 'center' }}>{recruit.position}</td>
                         <td style={{ textAlign: 'center' }}>{recruit.rating}</td>
                         <td style={{ textAlign: 'center' }}>{recruit.potential}</td>
@@ -313,9 +313,9 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
                 <Table>
                   <thead>
                     <tr>
+                      <th>Stars</th>
                       <th>Name</th>
                       <th>Position</th>
-                      <th>Stars</th>
                       <th>Direction</th>
                       <th>School</th>
                     </tr>
@@ -323,9 +323,9 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
                   <tbody>
                     {record.transfers?.map((transfer, index) => (
                       <tr key={index}>
+                        <td style={{ textAlign: 'center' }}>{transfer.stars} ★</td>
                         <td style={{ textAlign: 'center' }}>{transfer.playerName}</td>
                         <td style={{ textAlign: 'center' }}>{transfer.position}</td>
-                        <td style={{ textAlign: 'center' }}>{transfer.stars}</td>
                         <td style={{ textAlign: 'center' }}>{transfer.transferDirection}</td>
                         <td style={{ textAlign: 'center' }}>{transfer.school}</td>
                       </tr>
