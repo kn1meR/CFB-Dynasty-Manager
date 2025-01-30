@@ -95,7 +95,11 @@ const TrophyCase: React.FC = () => {
                 <p>{trophy.type}</p>
                 <p>{trophy.year}</p>
                 <Button
-                  onClick={() => removeTrophy(trophy.id)}
+                  onClick={() => {
+                    if (window.confirm("Are you sure you want to remove this trophy?")) {
+                      removeTrophy(trophy.id);
+                    }
+                  }}
                   variant="destructive"
                   size="sm"
                   className="mt-2"
