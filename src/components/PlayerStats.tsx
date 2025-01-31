@@ -16,12 +16,18 @@ interface PlayerStat {
   year: number;
   category: StatCategory;
   // Passing Stats
+  completions?: number;
+  attempts?: number;
   passyards?: number;
   passtd?: number;
   passint?: number;
   // Rushing Stats
+  carries?: number;
   rushyards?: number;
   rushtd?: number;
+  fumbles?: number;
+  yac?: number;
+  long?: number;
   // Receiving Stats
   receptions?: number;
   recyards?: number;
@@ -44,15 +50,26 @@ interface PlayerStat {
   [key: string]: string | number | undefined; // Index signature
 }
 
-type StatCategory = 'Passing' | 'Rushing' | 'Receiving' | 'Defense' | 'Kicking' | 'Return';
+type StatCategory = 'Passing' | 'Rushing' | 'Receiving' | 'Defense' | 'Kicking' | 'Punting' | 'Return';
 
 const statCategories: Record<StatCategory, string[]> = {
-  'Passing': ['Completions','Attempts','Pass Yards', 'Pass TD', 'Pass Int'],
-  'Rushing': ['Rush Yards', 'Rush TD'],
-  'Receiving': ['Receptions', 'Rec Yards', 'Rec TD'],
+  'Passing': ['Completions','Attempts','Pass Yards', 'Pass TD', 'Pass Int', 'Fumbles'],
+  'Rushing': ['Carries','Rush Yards', 'Rush TD', 'Fumbles', 'YAC', 'Long'],
+  'Receiving': ['Receptions', 'Rec Yards', 'Rec TD', 'Long', 'Fumbles'],
   'Defense': ['Tackles', 'Sacks', 'Def Int', 'Forced Fumbles'],
   'Kicking': ['FG Made', 'FG Attempted', 'XP Made', 'XP Attempted'],
-  'Return': ['KR Yards', 'KR TD', 'PR Yards', 'PR TD']
+  'Punting': ['Punts', 'Punt Yards', 'Touchbacks', 'Long'],
+  'Return': ['KR Yards', 'KR TD', 'PR Yards', 'PR TD', 'Long']
+};
+
+const displayCategories: Record<StatCategory, string[]> = {
+  'Passing': ['Completions', 'Attempts', 'Comp %', 'Pass Yards', 'YPA', 'Pass TD', 'Pass Int', 'Fumbles', 'RTG'],
+  'Rushing': ['Carries','Rush Yards', 'AVG', 'Rush TD', 'Fumbles', 'YAC', 'Long'],
+  'Receiving': ['Receptions', 'Rec Yards', 'AVG', 'Rec TD', 'Long', 'Fumbles'],
+  'Defense': ['Tackles', 'Sacks', 'Def Int', 'Forced Fumbles'],
+  'Kicking': ['FG Made', 'FG Attempted', 'XP Made', 'XP Attempted'],
+  'Punting': ['Punts', 'Punt Yards', 'Touchbacks', 'Long'],
+  'Return': ['KR Yards', 'KR TD', 'PR Yards', 'PR TD', 'Long']
 };
 
 interface RosterPlayer {
@@ -65,6 +82,36 @@ interface RosterPlayer {
   devTrait?: string;
   notes?: string;
 }
+
+const calculateCompletionPercentage = (completions: number = 0, attempts: number = 0): number => {
+  if (attempts === 0) return 0;
+  return Number(((completions / attempts) * 100).toFixed(1));
+};
+
+const calculateAverage = (yards: number = 0, attempts: number = 0): number => {
+  if (attempts === 0) return 0;
+  return Number((yards / attempts).toFixed(1));
+};
+
+const calculateQBR = (stats: PlayerStat): number => {
+  const completions = stats.completions || 0;
+  const attempts = stats.attempts || 0;
+  const yards = stats.passyards || 0;
+  const touchdowns = stats.passtd || 0;
+  const interceptions = stats.passint || 0;
+
+  if (attempts === 0) return 0;
+
+  // NCAA Passer Efficiency Formula
+  const rating = (
+    (8.4 * yards) + 
+    (330 * touchdowns) + 
+    (100 * completions) - 
+    (200 * interceptions)
+  ) / attempts;
+
+  return Number(rating.toFixed(1));
+};
 
 const PlayerStats: React.FC = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -117,30 +164,28 @@ const PlayerStats: React.FC = () => {
       setEditingId(null);
       toast.success('Stats updated successfully');
     } else {
+      const statValues = Object.entries(newStat)
+        .filter(([key]) => key !== 'name' && key !== 'year' && key !== 'category')
+        .reduce((acc, [key, value]) => ({
+          ...acc,
+          [key]: typeof value === 'number' ? value : 0
+        }), {});
 
-    // Create a new object with just the stat values, filtering out the required fields
-    const statValues = Object.entries(newStat)
-      .filter(([key]) => key !== 'name' && key !== 'year' && key !== 'category')
-      .reduce((acc, [key, value]) => ({
-        ...acc,
-        [key]: typeof value === 'number' ? value : 0
-      }), {});
+      const stat: PlayerStat = {
+        name: String(newStat.name),
+        year: Number(newStat.year),
+        category: selectedCategory,
+        id: Date.now().toString(),
+        ...statValues
+      };
 
-    const stat: PlayerStat = {
-      name: String(newStat.name),
-      year: Number(newStat.year),
-      category: selectedCategory,
-      id: Date.now().toString(),
-      ...statValues
-    };
-
-    setPlayerStats([...playerStats, stat]);
-    setNewStat({
-      name: '',
-      year: currentYear,
-      category: selectedCategory
-    });
-    toast.success('Stats added successfully');
+      setPlayerStats([...playerStats, stat]);
+      setNewStat({
+        name: '',
+        year: currentYear,
+        category: selectedCategory
+      });
+      toast.success('Stats added successfully');
     }
   };
 
@@ -155,7 +200,6 @@ const PlayerStats: React.FC = () => {
     if (viewType === 'Season') {
       return filteredStats.filter(stat => stat.year === currentYear);
     } else {
-      // For career stats, sum up all stats for each player within the selected category
       const playerTotals: { [key: string]: PlayerStat } = {};
       
       filteredStats.forEach(curr => {
@@ -174,6 +218,33 @@ const PlayerStats: React.FC = () => {
       
       return Object.values(playerTotals);
     }
+  };
+
+  const getStatValue = (stat: PlayerStat, category: string): string | number => {
+    const statKey = category.toLowerCase().replace(/\s/g, '');
+    
+    if (category === 'Comp %') {
+      return `${calculateCompletionPercentage(stat.completions, stat.attempts)}%`;
+    }
+    
+    if (category === 'RTG') {
+      return calculateQBR(stat);
+    }
+  
+    if (category === 'YPA') {
+      return calculateAverage(stat.passyards, stat.attempts);
+    }
+  
+    if (category === 'AVG') {
+      if (selectedCategory === 'Rushing') {
+        return calculateAverage(stat.rushyards, stat.carries);
+      }
+      if (selectedCategory === 'Receiving') {
+        return calculateAverage(stat.recyards, stat.receptions);
+      }
+    }
+    
+    return stat[statKey] || 0;
   };
 
   const renderStatInputs = () => {
@@ -258,11 +329,11 @@ const PlayerStats: React.FC = () => {
           </div>
           {editingId ? (
             <div className="flex gap-2">
-              <Button onClick={addStat} className="flex-1">Save Changes</Button>
+              <Button onClick={addStat}>Save Changes</Button>
               <Button onClick={cancelEditing} variant="outline">Cancel</Button>
             </div>
           ) : (
-            <Button onClick={addStat} className="w-full">Add Stats</Button>
+            <Button onClick={addStat}>Add Stats</Button>
           )}
         </CardContent>
       </Card>
@@ -274,7 +345,7 @@ const PlayerStats: React.FC = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                {statCategories[selectedCategory].map(stat => (
+                {displayCategories[selectedCategory].map(stat => (
                   <TableHead key={stat}>{stat}</TableHead>
                 ))}
                 <TableHead>Actions</TableHead>
@@ -284,14 +355,11 @@ const PlayerStats: React.FC = () => {
               {getDisplayStats().map(stat => (
                 <TableRow key={stat.id}>
                   <TableCell>{stat.name}</TableCell>
-                  {statCategories[selectedCategory].map(category => {
-                    const statKey = category.toLowerCase().replace(/\s/g, '');
-                    return (
-                      <TableCell key={category}>
-                        {stat[statKey] || 0}
-                      </TableCell>
-                    );
-                  })}
+                  {displayCategories[selectedCategory].map(category => (
+                    <TableCell key={category}>
+                      {getStatValue(stat, category)}
+                    </TableCell>
+                  ))}
                   <TableCell>
                     <div className="flex gap-2">
                       <Button
