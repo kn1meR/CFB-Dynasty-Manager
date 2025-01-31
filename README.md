@@ -1,10 +1,9 @@
 <ins>**Tutorial Video:**</ins>
 <div align="center">
   <a href="https://www.youtube.com/watch?v=-xD6pkTtBgU">
-    <img src="https://img.youtube.com/vi/-xD6pkTtBgU/0.jpg" alt="CFB Tracker"  width="100%">
+    <img src="https://github.com/user-attachments/assets/ba1550e6-e265-4d55-a425-b6c2eed25ed4" alt="CFB Tracker"  width="100%">
   </a>
 </div>
-
 <br>
 
 <ins>**FEATURES:**</ins>
