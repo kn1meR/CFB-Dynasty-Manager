@@ -1,3 +1,12 @@
+<ins>**Tutorial Video:**</ins>
+<div align="center">
+  <a href="https://www.youtube.com/watch?v=-xD6pkTtBgU">
+    <img src="https://img.youtube.com/vi/-xD6pkTtBgU/0.jpg" alt="CFB Tracker"  width="100%">
+  </a>
+</div>
+
+<br>
+
 <ins>**FEATURES:**</ins>
 
 1. Set Coach Name, School Name, and Year.
@@ -19,8 +28,6 @@
 
 
 <ins>**HOW TO USE:**</ins>
-
-https://youtu.be/-xD6pkTtBgU?si=SXIXCVD3sndKLV2G
 
 1. First you need to verify that you have [`node.js`](https://nodejs.org/en/download/package-manager/current) on your device. You can install it from the linked website, but if you want to check if you have it already, load up your device's terminal/console and type in `node -v`
 2. Once that's done, you want to download/clone the repository. For that you can click on the green code button and click "Download as ZIP".  If using this way, then extract `CFB25-Dynasty-Manager-main` from the .ZIP file and move to your Desktop.  Or you can use git and you can either use the command prompt `git clone <repo url>` or download Github Desktop which might be a bit easier if you are new to git and don't use it at all other than for this.
