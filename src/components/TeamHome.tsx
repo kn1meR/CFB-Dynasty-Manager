@@ -1,5 +1,5 @@
-// src/components/TeamHome.tsx
 "use client";
+
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
@@ -9,12 +9,12 @@ import { getCurrentYear, setCurrentYear, getSchedule, setSchedule, getYearStats,
 import { validateYear } from '@/utils/validationUtils';
 import { toast } from 'react-hot-toast';
 import Link from 'next/link';
-import { Calendar, Users, GraduationCap, User } from 'lucide-react';
+import { Calendar, GraduationCap, User } from 'lucide-react';
 import { Game, YearStats } from '@/types/yearRecord';
 
 const TeamHome: React.FC = () => {
   const router = useRouter();
-  const [currentYear, setYear] = useState<number>(getCurrentYear());
+  const [currentYear, setYear] = useState<number>(2024); // Start with default
   const [currentSchedule, setCurrentSchedule] = useState<Game[]>([]);
   const [yearStats, setCurrentYearStats] = useState<YearStats>({
     wins: 0,
@@ -30,14 +30,25 @@ const TeamHome: React.FC = () => {
   });
   const [isLoading, setIsLoading] = useState(true);
 
+  // Update year from localStorage after component mounts
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedYear = localStorage.getItem('currentYear');
+      if (storedYear) {
+        setYear(parseInt(storedYear));
+      }
+    }
+  }, []);
+
+  // Fetch data based on current year
   useEffect(() => {
     const fetchData = () => {
+      if (typeof window === 'undefined') return;
+
       try {
-        const year = getCurrentYear();
-        setYear(year);
-        const schedule = getSchedule(year);
+        const schedule = getSchedule(currentYear);
         setCurrentSchedule(schedule);
-        const stats = getYearStats(year);
+        const stats = getYearStats(currentYear);
         setCurrentYearStats(stats);
         setIsLoading(false);
       } catch (error) {
@@ -48,7 +59,22 @@ const TeamHome: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+
+    // Add event listener for storage changes
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'currentYear' && e.newValue) {
+        const newYear = parseInt(e.newValue);
+        if (newYear !== currentYear) {
+          setYear(newYear);
+        }
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', handleStorageChange);
+      return () => window.removeEventListener('storage', handleStorageChange);
+    }
+  }, [currentYear]);
 
   const endYear = () => {
     if(!validateYear(currentYear + 1)) {
@@ -73,7 +99,7 @@ const TeamHome: React.FC = () => {
       // Move to next year
       const newYear = currentYear + 1;
       setYear(newYear);
-      setCurrentYear(newYear);
+      localStorage.setItem('currentYear', newYear.toString());
       
       // Reset schedule for new year
       const newSchedule: Game[] = Array.from({ length:19 }, (_, i) => ({
@@ -106,13 +132,13 @@ const TeamHome: React.FC = () => {
       // Restore trophies after year change
       localStorage.setItem('allTrophies', JSON.stringify(existingTrophies));
   
-    router.refresh();
-    toast.success('Year ended successfully. Welcome to the new season!');
-  } catch (error) {
-    console.error('Error ending year:', error);
-    toast.error('Failed to end the year. Please try again.');
+      router.refresh();
+      toast.success('Year ended successfully. Welcome to the new season!');
+    } catch (error) {
+      console.error('Error ending year:', error);
+      toast.error('Failed to end the year. Please try again.');
+    }
   }
-}
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -129,7 +155,7 @@ const TeamHome: React.FC = () => {
         return `@ ${game.opponent}`;
       case 'vs':
         return `vs ${game.opponent}`;
-        case ' ':
+      case ' ':
         return `BYE ${game.opponent}`;
       default:
         return game.opponent;
@@ -154,10 +180,10 @@ const TeamHome: React.FC = () => {
         <Card>
           <CardHeader className="text-xl font-semibold">Team Stats Summary</CardHeader>
           <CardContent>
-            <p>Avg. Points Scored: <strong>{(yearStats.pointsScored / (yearStats.wins + yearStats.losses)).toFixed(1)}</strong></p>
-            <p>Avg. Points Allowed: <strong>{(yearStats.pointsAgainst / (yearStats.wins + yearStats.losses)).toFixed(1)}</strong></p>
-            <p>Win Percentage: <strong>{((yearStats.wins / (yearStats.wins + yearStats.losses)) * 100).toFixed(1)}%</strong></p>
-            <p>Conference Win Percentage: <strong>{((yearStats.conferenceWins / (yearStats.conferenceWins + yearStats.conferenceLosses)) * 100).toFixed(1)}%</strong></p>
+            <p>Avg. Points Scored: <strong>{(yearStats.pointsScored / (yearStats.wins + yearStats.losses) || 0).toFixed(1)}</strong></p>
+            <p>Avg. Points Allowed: <strong>{(yearStats.pointsAgainst / (yearStats.wins + yearStats.losses) || 0).toFixed(1)}</strong></p>
+            <p>Win Percentage: <strong>{((yearStats.wins / (yearStats.wins + yearStats.losses) || 0) * 100).toFixed(1)}%</strong></p>
+            <p>Conference Win Percentage: <strong>{((yearStats.conferenceWins / (yearStats.conferenceWins + yearStats.conferenceLosses) || 0) * 100).toFixed(1)}%</strong></p>
           </CardContent>
         </Card>
 
@@ -217,14 +243,14 @@ const TeamHome: React.FC = () => {
               </Link>
               <Link href="/roster" className="block">
                 <Button className="w-full flex items-center justify-center">
-                <User className="mr-2" size={18} />
-                Manage Roster
+                  <User className="mr-2" size={18} />
+                  Manage Roster
                 </Button>
               </Link>
               <Link href="/recruiting" className="block">
                 <Button className="w-full flex items-center justify-center">
-                <GraduationCap className="mr-2" size={18} />
-                Recruiting
+                  <GraduationCap className="mr-2" size={18} />
+                  Recruiting
                 </Button>
               </Link>
             </div>

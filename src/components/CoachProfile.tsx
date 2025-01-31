@@ -9,30 +9,72 @@ import { Label } from '@/components/ui/label';
 import { User, School, Calendar } from 'lucide-react';
 import { fbsTeams } from '@/utils/fbsTeams';
 import { notifySuccess, notifyError, MESSAGES } from '@/utils/notification-utils';
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const CoachProfile = () => {
-  const [profile, setProfile] = useState({ coachName: '', schoolName: '', currentYear: 2024 });
+  const defaultProfile = {
+    coachName: '',
+    schoolName: '',
+    currentYear: 2024
+  };
+
+  const [profile, setProfile] = useState(defaultProfile);
   const [isEditing, setIsEditing] = useState(false);
+  const [isConfirmingReset, setIsConfirmingReset] = useState(false);
 
   useEffect(() => {
-    const storedProfile = {
-      coachName: localStorage.getItem('coachName') || '',
-      schoolName: localStorage.getItem('schoolName') || '',
-      currentYear: parseInt(localStorage.getItem('currentYear') || '2024', 10)
-    };
-    setProfile(storedProfile);
+    try {
+      const storedProfile = {
+        coachName: localStorage.getItem('coachName') || '',
+        schoolName: localStorage.getItem('schoolName') || '',
+        currentYear: parseInt(localStorage.getItem('currentYear') || '2024', 10)
+      };
+      setProfile(storedProfile);
+    } catch (error) {
+      console.error('Error loading profile:', error);
+      notifyError('Failed to load profile data');
+    }
   }, []);
 
   const handleSave = () => {
-    Object.entries(profile).forEach(([key, value]) => localStorage.setItem(key, value.toString()));
-    setIsEditing(false);
-    notifySuccess(MESSAGES.SAVE_SUCCESS);
+    try {
+      Object.entries(profile).forEach(([key, value]) => 
+        localStorage.setItem(key, value.toString())
+      );
+      setIsEditing(false);
+      notifySuccess(MESSAGES.SAVE_SUCCESS);
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      notifyError(MESSAGES.SAVE_ERROR);
+    }
   };
 
   const handleReset = () => {
-    if (confirm('Are you sure you want to reset all data? This action cannot be undone.')) {
+    try {
       localStorage.clear();
-      setProfile({ coachName: '', schoolName: '', currentYear: 2024 });
+      setProfile(defaultProfile);
+      setIsConfirmingReset(false);
+      setIsEditing(false);
+      
+      // Reopen dialog after a brief delay
+      setTimeout(() => {
+        setIsEditing(true);
+      }, 100);
+      
+      notifySuccess('Data reset successfully');
+    } catch (error) {
+      console.error('Error resetting data:', error);
+      notifyError('Failed to reset data');
     }
   };
 
@@ -71,6 +113,7 @@ const CoachProfile = () => {
                 onChange={(e) => setProfile({ ...profile, coachName: e.target.value })}
                 placeholder="Coach Name"
                 className="col-span-3"
+                autoComplete="off"
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
@@ -101,11 +144,33 @@ const CoachProfile = () => {
                 value={profile.currentYear}
                 onChange={(e) => setProfile({ ...profile, currentYear: parseInt(e.target.value, 10) })}
                 className="col-span-3"
+                min={2024}
+                max={2054}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={handleReset}>Reset Data</Button>
+            <AlertDialog open={isConfirmingReset} onOpenChange={setIsConfirmingReset}>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline">Reset Data</Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will reset all application data and cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel onClick={() => setIsConfirmingReset(false)}>
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction onClick={handleReset}>
+                    Reset Data
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
             <Button onClick={handleSave}>Save Changes</Button>
           </DialogFooter>
         </DialogContent>
