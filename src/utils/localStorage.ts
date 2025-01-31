@@ -6,31 +6,36 @@ import { Game, YearRecord, YearStats } from "@/types/yearRecord";
 import { stat } from "fs";
 import { getTeamByName } from "./fbsTeams";
 
-export const getCurrentYear = (): number => {
-  if (typeof window !== 'undefined') {
-    const storedYear = localStorage.getItem('currentYear');
-    return storedYear ? parseInt(storedYear, 10) : new Date().getFullYear();
+const safeLocalStorage = {
+  getItem: (key: string): string | null => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(key);
+    }
+    return null;
+  },
+  setItem: (key: string, value: string): void => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(key, value);
+    }
   }
-  return new Date().getFullYear();
+};
+
+export const getCurrentYear = (): number => {
+  const storedYear = safeLocalStorage.getItem('currentYear');
+  return storedYear ? parseInt(storedYear, 10) : 2024;
 };
 export const setCurrentYear = (year: number): void => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('currentYear', year.toString());
-  }
+  safeLocalStorage.setItem('currentYear', year.toString());
 };
 export const getSchedule = (year: number): Game[] => {
-  if (typeof window !== 'undefined') {
-    const storedSchedule = localStorage.getItem(`schedule_${year}`);
-    if (storedSchedule) {
-      return JSON.parse(storedSchedule);
-    }
+  const storedSchedule = safeLocalStorage.getItem(`schedule_${year}`);
+  if (storedSchedule) {
+    return JSON.parse(storedSchedule);
   }
   return [];
 };
 export const setSchedule = (year: number, schedule: Game[]): void => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(`schedule_${year}`, JSON.stringify(schedule));
-  }
+  safeLocalStorage.setItem(`schedule_${year}`, JSON.stringify(schedule));
 };
 export const calculateStats = (schedule: Game[]): YearStats => {
   let wins = 0, losses = 0, pointsScored = 0, pointsAgainst = 0, conferenceWins = 0, conferenceLosses = 0;
