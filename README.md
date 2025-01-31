@@ -20,6 +20,8 @@
 
 <ins>**HOW TO USE:**</ins>
 
+https://youtu.be/-xD6pkTtBgU?si=SXIXCVD3sndKLV2G
+
 1. First you need to verify that you have [`node.js`](https://nodejs.org/en/download/package-manager/current) on your device. You can install it from the linked website, but if you want to check if you have it already, load up your device's terminal/console and type in `node -v`
 2. Once that's done, you want to download/clone the repository. For that you can click on the green code button and click "Download as ZIP".  If using this way, then extract `CFB25-Dynasty-Manager-main` from the .ZIP file and move to your Desktop.  Or you can use git and you can either use the command prompt `git clone <repo url>` or download Github Desktop which might be a bit easier if you are new to git and don't use it at all other than for this.
 3. Once the repo is cloned, you need to use the Terminal again.  Go to the `CFB25-Dynasty-Manager-main` folder on your desktop, Right-Click on the folder, and select `Copy Path`.  Then, open Command Prompt, and type `cd` and paste the path you copied, and then run `npm install`. This will install the dependencies.
