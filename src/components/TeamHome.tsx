@@ -12,6 +12,12 @@ import Link from 'next/link';
 import { Calendar, GraduationCap, User } from 'lucide-react';
 import { Game, YearStats } from '@/types/yearRecord';
 
+interface LocationRecord {
+  wins: number;
+  losses: number;
+  ties: number;
+}
+
 const TeamHome: React.FC = () => {
   const router = useRouter();
   const [currentYear, setYear] = useState<number>(2024); // Start with default
@@ -162,40 +168,121 @@ const TeamHome: React.FC = () => {
     }
   };
 
+  const calculateLocationRecord = (location: '@' | 'vs' | 'neutral'): LocationRecord => {
+    const filteredGames = currentSchedule.filter(game => 
+      game.location === location && game.result !== 'N/A' && game.result !== 'Bye'
+    );
+    
+    return {
+      wins: filteredGames.filter(game => game.result === 'Win').length,
+      losses: filteredGames.filter(game => game.result === 'Loss').length,
+      ties: filteredGames.filter(game => game.result === 'Tie').length
+    };
+  };
+
+  const homeRecord = calculateLocationRecord('vs');
+  const awayRecord = calculateLocationRecord('@');
+  const neutralRecord = calculateLocationRecord('neutral');
+
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold text-center">Team Dashboard - {currentYear}</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader className="text-xl font-semibold text-center">Current Record</CardHeader>
-          <CardContent>
-            <p className="text-center text-5xl font-bold">
-              {yearStats.wins} - {yearStats.losses} 
-              <br />({yearStats.conferenceWins} - {yearStats.conferenceLosses})
-            </p>
+        <Card className="col-span-1">
+          <CardContent className="pt-6">
+            <div className="text-center space-y-4">
+              <div className="relative w-48 h-48 mx-auto">
+                <div className="absolute inset-0">
+                  <svg className="w-full h-full" viewBox="0 0 100 100">
+                    <circle
+                      className="text-gray-200 dark:text-gray-700 stroke-current"
+                      strokeWidth="10"
+                      fill="transparent"
+                      r="45"
+                      cx="50"
+                      cy="50"
+                    />
+                    <circle
+                      className="text-blue-600 stroke-current"
+                      strokeWidth="10"
+                      fill="transparent"
+                      r="45"
+                      cx="50"
+                      cy="50"
+                      strokeDasharray={`${((yearStats.wins / (yearStats.wins + yearStats.losses)) || 0) * 283} 283`}
+                      strokeDashoffset="0"
+                      transform="rotate(-90 50 50)"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <div className="text-4xl font-bold">
+                      {yearStats.wins}-{yearStats.losses}
+                    </div>
+                    <div className="text-xl mt-2">.{Math.round((yearStats.wins / (yearStats.wins + yearStats.losses) || 0) * 1000)}</div>
+                  </div>
+                </div>
+              </div>
+              <div className="text-lg font-semibold">
+                Conference: {yearStats.conferenceWins}-{yearStats.conferenceLosses}
+              </div>
+              <div className="flex justify-around text-sm">
+                <div>
+                  <div className="font-semibold">Home</div>
+                  <div>{homeRecord.wins}-{homeRecord.losses}{homeRecord.ties > 0 ? `-${homeRecord.ties}` : ''}</div>
+                </div>
+                <div>
+                  <div className="font-semibold">Away</div>
+                  <div>{awayRecord.wins}-{awayRecord.losses}{awayRecord.ties > 0 ? `-${awayRecord.ties}` : ''}</div>
+                </div>
+                <div>
+                  <div className="font-semibold">Neutral</div>
+                  <div>{neutralRecord.wins}-{neutralRecord.losses}{neutralRecord.ties > 0 ? `-${neutralRecord.ties}` : ''}</div>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="text-xl font-semibold">Team Stats Summary</CardHeader>
           <CardContent>
-            <p>Avg. Points Scored: <strong>{(yearStats.pointsScored / (yearStats.wins + yearStats.losses) || 0).toFixed(1)}</strong></p>
-            <p>Avg. Points Allowed: <strong>{(yearStats.pointsAgainst / (yearStats.wins + yearStats.losses) || 0).toFixed(1)}</strong></p>
-            <p>Win Percentage: <strong>{((yearStats.wins / (yearStats.wins + yearStats.losses) || 0) * 100).toFixed(1)}%</strong></p>
-            <p>Conference Win Percentage: <strong>{((yearStats.conferenceWins / (yearStats.conferenceWins + yearStats.conferenceLosses) || 0) * 100).toFixed(1)}%</strong></p>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span>Points Per Game:</span>
+                <span className="font-bold">{(yearStats.pointsScored / (yearStats.wins + yearStats.losses) || 0).toFixed(1)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Points Allowed:</span>
+                <span className="font-bold">{(yearStats.pointsAgainst / (yearStats.wins + yearStats.losses) || 0).toFixed(1)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Point Differential:</span>
+                <span className="font-bold">{((yearStats.pointsScored - yearStats.pointsAgainst) / (yearStats.wins + yearStats.losses) || 0).toFixed(1)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Conf. Win %:</span>
+                <span className="font-bold">{((yearStats.conferenceWins / (yearStats.conferenceWins + yearStats.conferenceLosses) || 0) * 100).toFixed(1)}%</span>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
+        {/* [Rest of the cards remain the same] */}
+        
         <Card>
           <CardHeader className="text-xl font-semibold">Recent Games</CardHeader>
           <CardContent>
             <ul>
               {recentGames.map((game, index) => (
                 <li key={index} className="mb-2 flex justify-between items-center">
-                  <span><strong>Week {game.week}:</strong> {formatGameDisplay(game)}</span>
-                  <span className={game.result === 'Win' ? 'text-green-500' : 'text-red-500'}>
-                    {game.result} ({game.score})
+                  <span><strong>Week {game.week}: </strong> {formatGameDisplay(game)}</span>
+                  <span className={
+                    game.result === 'Win' ? 'text-green-500' : 
+                    game.result === 'Loss' ? 'text-red-500' : 
+                    'text-gray-500 dark:text-gray-400'
+                  }>
+                    {game.result} {game.result !== 'Bye' && ` - ${game.score}`}
                   </span>
                 </li>
               ))}
@@ -203,6 +290,8 @@ const TeamHome: React.FC = () => {
           </CardContent>
         </Card>
 
+        {/* [Rest of the existing component code remains the same] */}
+        
         <Card>
           <CardHeader className="text-xl font-semibold">Upcoming Games</CardHeader>
           <CardContent>
