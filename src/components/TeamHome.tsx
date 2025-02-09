@@ -143,7 +143,7 @@ const TeamHome: React.FC = () => {
       localStorage.setItem('currentYear', newYear.toString());
 
       // Reset schedule for new year
-      const newSchedule: Game[] = Array.from({ length: 19 }, (_, i) => ({
+      const newSchedule: Game[] = Array.from({ length: 21 }, (_, i) => ({
         id: i,
         week: i,
         location: 'neutral',
