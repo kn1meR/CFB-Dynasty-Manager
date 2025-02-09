@@ -29,7 +29,7 @@ const SchedulePage: React.FC = () => {
     setYear(year);
     const schedule = getSchedule(year);
     if (schedule.length === 0) {
-      const newSchedule: Game[] = Array.from({ length: 19 }, (_, i) => ({
+      const newSchedule: Game[] = Array.from({ length: 21 }, (_, i) => ({
         id: i,
         week: i,
         location: 'neutral',
