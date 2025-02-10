@@ -11,6 +11,7 @@ export interface Player {
     position: string;
     year: string;
     rating: string;
+    jerseyNumber: string;
 }
 
 export interface Recruit {
@@ -36,4 +37,4 @@ export interface Transfer {
 export interface DraftedPlayer {
     playerName: string;
     round: string;
-}
+  }
