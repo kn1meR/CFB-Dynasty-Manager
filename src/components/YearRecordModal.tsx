@@ -1,6 +1,4 @@
-// src/components/YearRecordModal.tsx
-
-/* eslint-disable react-hooks/exhaustive-deps */
+"use client"
 
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -9,17 +7,29 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table } from '@/components/ui/table';
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DraftedPlayer, Recruit, Transfer } from '@/types/playerTypes';
-import { Award } from '@/types/statTypes';
+//import { Award } from '@/types/statTypes';
 import { YearRecord, Game, YearStats } from '@/types/yearRecord';
 import { getRecruits, getTransfers, getYearAwards, getYearRecord } from '@/utils/localStorage';
 import { notifySuccess, notifyError, MESSAGES } from '@/utils/notification-utils';
+import { Card, CardContent } from "@/components/ui/card";
+import { Trophy, Medal, Star, TrendingUp, Users, Award } from "lucide-react";
+
 
 interface YearRecordModalProps {
   year: number;
   onClose: () => void;
 }
+
+const SCHEDULE_SIZE = 21;
+
 const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
+  const [activeTab, setActiveTab] = useState('general');
+  const defaultSchedule: Game[] = Array(SCHEDULE_SIZE)
+    .fill({ week: 0, opponent: '', result: '', score: '' })
+    .map((game, index) => ({ ...game, week: index }));
+
   const [record, setRecord] = useState<YearRecord>({
     year,
     overallRecord: '',
@@ -30,7 +40,7 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
     pointsAgainst: '',
     natChamp: '',
     heisman: '',
-    schedule: Array(19).fill({ week: 0, opponent: '', result: '', score: '' }).map((game, index) => ({ ...game, week: index })),
+    schedule: defaultSchedule,
     recruits: [],
     transfers: [],
     playerAwards: [],
@@ -39,342 +49,544 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
   });
 
   useEffect(() => {
-    let existingRecord = getYearRecord(year);
-
-    if(existingRecord.playerAwards.length == 0) {
-      const yearAwards = getYearAwards(year);
-      existingRecord = {
-        ...existingRecord, 
-        playerAwards: yearAwards
+    const loadData = async () => {
+      try {
+        let existingRecord = getYearRecord(year);
+        
+        // Handle schedule expansion while preserving existing data
+        let updatedSchedule = existingRecord.schedule || [];
+        if (updatedSchedule.length < SCHEDULE_SIZE) {
+          // Create additional empty slots while preserving existing games
+          const additionalSlots = Array(SCHEDULE_SIZE - updatedSchedule.length)
+            .fill({ week: 0, opponent: '', result: '', score: '' })
+            .map((game, index) => ({ 
+              ...game, 
+              week: updatedSchedule.length + index 
+            }));
+          
+          updatedSchedule = [...updatedSchedule, ...additionalSlots];
+        }
+  
+        const updates = {
+          playerAwards: existingRecord.playerAwards.length === 0 ? getYearAwards(year) : existingRecord.playerAwards,
+          transfers: existingRecord.transfers?.length === 0 ? getTransfers(year) : existingRecord.transfers,
+          recruits: existingRecord.recruits?.length === 0 ? getRecruits(year) : existingRecord.recruits,
+          schedule: updatedSchedule
+        };
+  
+        setRecord({ ...existingRecord, ...updates });
+      } catch (error) {
+        notifyError(MESSAGES.SAVE_ERROR);
       }
-    }
-    if(existingRecord.transfers?.length == 0) {
-      const yearTransfers = getTransfers(year);
-      existingRecord = {
-        ...existingRecord, 
-        transfers: yearTransfers
-      }
-    }
-    if(existingRecord.recruits?.length == 0) {
-      const yearRecruits = getRecruits(year);
-      existingRecord = {
-        ...existingRecord, 
-        recruits: yearRecruits
-      }
-    }
-
-    setRecord(existingRecord);
-
+    };
+  
+    loadData();
   }, [year]);
 
   const handleSave = () => {
-    const storedRecords = localStorage.getItem('yearRecords');
-    let records: YearRecord[] = storedRecords ? JSON.parse(storedRecords) : [];
-    const existingIndex = records.findIndex(r => r.year === year);
-  
-    if (existingIndex !== -1) {
-      records[existingIndex] = record;
-    } else {
-      records.push(record);
+    try {
+      const storedRecords = localStorage.getItem('yearRecords');
+      let records: YearRecord[] = storedRecords ? JSON.parse(storedRecords) : [];
+      const existingIndex = records.findIndex(r => r.year === year);
+    
+      if (existingIndex !== -1) {
+        records[existingIndex] = record;
+      } else {
+        records.push(record);
+      }
+    
+      localStorage.setItem('yearRecords', JSON.stringify(records));
+      notifySuccess(MESSAGES.SAVE_SUCCESS);
+      onClose();
+    } catch (error) {
+      notifyError(MESSAGES.SAVE_ERROR);
     }
-  
-    localStorage.setItem('yearRecords', JSON.stringify(records));
-    notifySuccess(MESSAGES.SAVE_SUCCESS);
-    onClose();
   };
 
   const updateSchedule = (index: number, field: keyof Game, value: string) => {
-    if (record.schedule) {
-      const updatedSchedule = [...record.schedule];
+    setRecord(prev => {
+      const updatedSchedule = [...prev.schedule];
       updatedSchedule[index] = { ...updatedSchedule[index], [field]: value };
-      setRecord({ ...record, schedule: updatedSchedule });
-    }
+      return { ...prev, schedule: updatedSchedule };
+    });
+  };
+
+  const updateDraftedPlayer = (index: number, field: keyof DraftedPlayer, value: string) => {
+    setRecord(prev => {
+      const updatedPlayersDrafted = [...prev.playersDrafted];
+      updatedPlayersDrafted[index] = { ...updatedPlayersDrafted[index], [field]: value };
+      return { ...prev, playersDrafted: updatedPlayersDrafted };
+    });
   };
 
   const addDraftedPlayer = () => {
     setRecord(prev => ({
       ...prev,
-      playersDrafted: [...prev.playersDrafted, { playerName: '', round: '' }]
+      playersDrafted: [...prev.playersDrafted, { playerName: '', round: '', isLocked: false }]
     }));
   };
 
-  const updateDraftedPlayer = (index: number, field: keyof DraftedPlayer, value: string) => {
-    const updatedPlayersDrafted = [...record.playersDrafted];
-    updatedPlayersDrafted[index] = { ...updatedPlayersDrafted[index], [field]: value };
-    setRecord({ ...record, playersDrafted: updatedPlayersDrafted });
+  const saveDraftedPlayer = (index: number) => {
+    const player = record.playersDrafted[index];
+    if (!player.playerName || !player.round) {
+      notifyError('Please fill in both player name and round before saving');
+      return;
+    }
+  
+    // If this was the last row, add a new empty row
+    if (index === record.playersDrafted.length - 1) {
+      setRecord(prev => ({
+        ...prev,
+        playersDrafted: [...prev.playersDrafted, { playerName: '', round: '' }]
+      }));
+    }
+    notifySuccess('Player drafted successfully');
   };
 
   const removeDraftedPlayer = (index: number) => {
-    const updatedPlayersDrafted = record.playersDrafted.filter((_, i) => i !== index);
-    setRecord({ ...record, playersDrafted: updatedPlayersDrafted });
-    notifySuccess(MESSAGES.SAVE_SUCCESS);
+    setRecord(prev => ({
+      ...prev,
+      playersDrafted: prev.playersDrafted.filter((_, i) => i !== index)
+    }));
+    notifySuccess(MESSAGES.DELETE_SUCCESS);
+  };
+
+  const calculatePointDifferential = (pointsFor: string, pointsAgainst: string) => {
+    const pf = parseInt(pointsFor) || 0;
+    const pa = parseInt(pointsAgainst) || 0;
+    const diff = pf - pa;
+    return diff > 0 ? `+${diff}` : diff.toString();
   };
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="max-w-[90vw] w-full max-h-[90vh] h-full flex flex-col">
         <DialogHeader>
-          <DialogTitle className="text-2xl text-center">{year} Season Stats</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-center">{year} Season Record</DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col md:flex-row gap-6 flex-grow overflow-hidden">
-          <div className="w-full md:w-1/3 space-y-4 overflow-y-auto p-4">
-            <ScrollArea className="h-full">
-              <div className="space-y-4">
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <label htmlFor="overallRecord" className="text-right">Overall Record:</label>
-                  <Input
-                    id="overallRecord"
-                    value={record.overallRecord}
-                    onChange={(e) => setRecord({ ...record, overallRecord: e.target.value })}
-                    className="col-span-2"
-                  />
+        
+        <Tabs defaultValue="general" className="flex-grow flex flex-col" value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="general">General Stats</TabsTrigger>
+            <TabsTrigger value="schedule">Schedule</TabsTrigger>
+            <TabsTrigger value="recruits">Recruits & Transfers</TabsTrigger>
+            <TabsTrigger value="awards">Awards & Draft</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="general" className="flex-grow">
+            <ScrollArea className="h-full p-4">
+              <div className="space-y-8 max-w-4xl mx-auto">
+                {/* Season Summary Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Card className="bg-blue-50">
+                    <CardContent className="pt-6">
+                      <div className="flex items-center gap-4">
+                        <Trophy className="h-8 w-8 text-blue-600" />
+                        <div>
+                          <p className="text-sm font-medium text-blue-600">Overall Record</p>
+                          <h3 className="text-2xl font-bold text-blue-600">{record.overallRecord || "0-0"}</h3>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-green-50">
+                    <CardContent className="pt-6">
+                      <div className="flex items-center gap-4">
+                        <Medal className="h-8 w-8 text-green-600" />
+                        <div>
+                          <p className="text-sm font-medium text-green-600">Conference Record</p>
+                          <h3 className="text-2xl font-bold text-green-600">{record.conferenceRecord || "0-0"}</h3>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-purple-50">
+                    <CardContent className="pt-6">
+                      <div className="flex items-center gap-4">
+                        <Star className="h-8 w-8 text-purple-600" />
+                        <div>
+                          <p className="text-sm font-medium text-purple-600">Recruiting Rank</p>
+                          <h3 className="text-2xl font-bold text-purple-600">#{record.recruitingClassPlacement || "—"}</h3>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <label htmlFor="conferenceRecord" className="text-right">Conference Record:</label>
-                  <Input
-                    id="conferenceRecord"
-                    value={record.conferenceRecord}
-                    onChange={(e) => setRecord({ ...record, conferenceRecord: e.target.value })}
-                    className="col-span-2"
-                  />
-                </div>
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <label htmlFor="pointsFor" className="text-right">Points For:</label>
-                  <Input
-                    id="pointsFor"
-                    value={record.pointsFor}
-                    onChange={(e) => setRecord({ ...record, pointsFor: e.target.value })}
-                    className="col-span-2"
-                  />
-                </div>
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <label htmlFor="pointsAgainst" className="text-right">Points Against:</label>
-                  <Input
-                    id="pointsAgainst"
-                    value={record.pointsAgainst}
-                    onChange={(e) => setRecord({ ...record, pointsAgainst: e.target.value })}
-                    className="col-span-2"
-                  />
-                </div>
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <label htmlFor="bowlGame" className="text-right">Bowl Game:</label>
-                  <Input
-                    id="bowlGame"
-                    value={record.bowlGame}
-                    onChange={(e) => setRecord({ ...record, bowlGame: e.target.value })}
-                    className="col-span-2"
-                  />
-                </div>
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <label htmlFor="bowlResult" className="text-right">Bowl Result:</label>
-                  <Select
-                    value={record.bowlResult}
-                    onValueChange={(value) => setRecord({ ...record, bowlResult: value })}
-                  >
-                    <SelectTrigger className="col-span-2">
-                      <SelectValue placeholder="Select result" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Win">W</SelectItem>
-                      <SelectItem value="Loss">L</SelectItem>
-                      <SelectItem value="N/A">N/A</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <label htmlFor="natChamp" className="text-right">National Champion:</label>
-                  <Input
-                    id="natChamp"
-                    value={record.natChamp}
-                    onChange={(e) => setRecord({ ...record, natChamp: e.target.value })}
-                    className="col-span-2"
-                  />
-                </div>
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <label htmlFor="heisman" className="text-right">Heisman Winner:</label>
-                  <Input
-                    id="heisman"
-                    value={record.heisman}
-                    onChange={(e) => setRecord({ ...record, heisman: e.target.value })}
-                    className="col-span-2"
-                  />
-                </div>
-              
-              <div className="grid grid-cols-3 items-center gap-4">
-                  <label htmlFor="classRanking" className="text-right">Recruiting Class Rank:</label>
-                  <Input
-                    id="classRanking"
-                    value={record.recruitingClassPlacement}
-                    onChange={(e) => setRecord({ ...record, recruitingClassPlacement: e.target.value })}
-                    className="col-span-2"
-                  />
-                </div>
-                </div>
-            </ScrollArea>
-          </div>
-          {record.schedule && (
-            <div className="w-full md:w-1/3 overflow-hidden">
-              <h3 className="text-xl text-center font-semibold mb-2">{year} Schedule</h3>
-              <ScrollArea className="h-[calc(100%-3rem)] w-full rounded-md border p-4">
-                <Table>
-                  <thead>
-                    <tr>
-                      <th className="w-1/6">Week</th>
-                      <th className="w-1/3">Opponent</th>
-                      <th className="w-1/4">Result</th>
-                      <th className="w-1/4">Score</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {record.schedule.map((game, index) => (
-                      <tr key={index}>
-                        <td>{game.week}</td>
-                        <td>
+
+                {/* Points Summary */}
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div>
+                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                          <TrendingUp className="h-5 w-5" />
+                          Scoring Stats
+                        </h3>
+                        <div className="space-y-4">
+                          <div className="flex justify-between items-center border-b pb-2">
+                            <label className="font-medium">Points For</label>
+                            <Input
+                              id="pointsFor"
+                              value={record.pointsFor}
+                              onChange={(e) => setRecord(prev => ({ ...prev, pointsFor: e.target.value }))}
+                              placeholder="0"
+                              className="w-32 text-right"
+                            />
+                          </div>
+                          <div className="flex justify-between items-center border-b pb-2">
+                            <label className="font-medium">Points Against</label>
+                            <Input
+                              id="pointsAgainst"
+                              value={record.pointsAgainst}
+                              onChange={(e) => setRecord(prev => ({ ...prev, pointsAgainst: e.target.value }))}
+                              placeholder="0"
+                              className="w-32 text-right"
+                            />
+                          </div>
+                          <div className="flex justify-between items-center text-lg font-semibold">
+                            <span>Point Differential</span>
+                            <span>{calculatePointDifferential(record.pointsFor, record.pointsAgainst)}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                          <Award className="h-5 w-5" />
+                          Records
+                        </h3>
+                        <div className="space-y-4">
+                          <div className="flex justify-between items-center">
+                            <label className="font-medium">Overall Record</label>
+                            <Input
+                              id="overallRecord"
+                              value={record.overallRecord}
+                              onChange={(e) => setRecord(prev => ({ ...prev, overallRecord: e.target.value }))}
+                              placeholder="0-0"
+                              className="w-32"
+                            />
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <label className="font-medium">Conference Record</label>
+                            <Input
+                              id="conferenceRecord"
+                              value={record.conferenceRecord}
+                              onChange={(e) => setRecord(prev => ({ ...prev, conferenceRecord: e.target.value }))}
+                              placeholder="0-0"
+                              className="w-32"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Bowl Game & Championships */}
+                <Card>
+                  <CardContent className="pt-6">
+                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                      <Trophy className="h-5 w-5" />
+                      Season Achievements
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <label className="font-medium">Bowl Game</label>
                           <Input
-                            value={game.opponent}
-                            onChange={(e) => updateSchedule(index, 'opponent', e.target.value)}
+                            id="bowlGame"
+                            value={record.bowlGame}
+                            onChange={(e) => setRecord(prev => ({ ...prev, bowlGame: e.target.value }))}
+                            placeholder="Bowl Name"
                           />
-                        </td>
-                        <td>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="font-medium">Bowl Result</label>
                           <Select
-                            value={game.result}
-                            onValueChange={(value) => updateSchedule(index, 'result', value)}
+                            value={record.bowlResult}
+                            onValueChange={(value) => setRecord(prev => ({ ...prev, bowlResult: value }))}
                           >
                             <SelectTrigger>
-                              <SelectValue />
+                              <SelectValue placeholder="Select result" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="Win">W</SelectItem>
-                              <SelectItem value="Loss">L</SelectItem>
-                              <SelectItem value="Tie">T</SelectItem>
-                              <SelectItem value="Bye">Bye</SelectItem>
-                              <SelectItem value="N/A">-</SelectItem>
+                              <SelectItem value="Win">Win</SelectItem>
+                              <SelectItem value="Loss">Loss</SelectItem>
+                              <SelectItem value="N/A">N/A</SelectItem>
                             </SelectContent>
                           </Select>
-                        </td>
-                        <td>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <label className="font-medium">National Champion</label>
                           <Input
-                            value={game.score}
-                            onChange={(e) => updateSchedule(index, 'score', e.target.value)}
+                            id="natChamp"
+                            value={record.natChamp}
+                            onChange={(e) => setRecord(prev => ({ ...prev, natChamp: e.target.value }))}
+                            placeholder="Team Name"
                           />
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              </ScrollArea>
-            </div>
-          )}
-          <div className="w-full md:w-1/3 overflow-hidden">
-            <h3 className="text-xl text-center font-semibold mb-2">{year} Recruits, Transfers, and Awards</h3>
-            <ScrollArea className="h-[calc(100%-3rem)] w-full rounded-md border p-4">
-              <div className="space-y-4">
-                <h4 className="text-lg font-semibold text-center">Player Awards</h4>
-                <Table>
-                  <thead>
-                    <tr>
-                      <th>Player</th>
-                      <th>Award Name</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {record.playerAwards?.map((award, index) => (
-                      <tr key={index}>
-                        <td style={{ textAlign: 'center' }}>{award.playerName}</td>
-                        <td style={{ textAlign: 'center' }}>{award.awardName}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-                <h4 className="text-lg font-semibold text-center">Recruits</h4>
-                <Table>
-                  <thead>
-                    <tr>
-                      <th>Stars</th>
-                      <th>Name</th>
-                      <th>Position</th>
-                      <th>Rating</th>
-                      <th>Potential</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {record.recruits?.map((recruit, index) => (
-                      <tr key={index}>
-                        <td style={{ textAlign: 'center' }}>{recruit.stars} ★</td>
-                        <td style={{ textAlign: 'center' }}>{recruit.name}</td>
-                        <td style={{ textAlign: 'center' }}>{recruit.position}</td>
-                        <td style={{ textAlign: 'center' }}>{recruit.rating}</td>
-                        <td style={{ textAlign: 'center' }}>{recruit.potential}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-                <h4 className="text-lg font-semibold mt-4 text-center">Transfers</h4>
-                <Table>
-                  <thead>
-                    <tr>
-                      <th>Stars</th>
-                      <th>Name</th>
-                      <th>Position</th>
-                      <th>Direction</th>
-                      <th>School</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {record.transfers?.map((transfer, index) => (
-                      <tr key={index}>
-                        <td style={{ textAlign: 'center' }}>{transfer.stars} ★</td>
-                        <td style={{ textAlign: 'center' }}>{transfer.playerName}</td>
-                        <td style={{ textAlign: 'center' }}>{transfer.position}</td>
-                        <td style={{ textAlign: 'center' }}>{transfer.transferDirection}</td>
-                        <td style={{ textAlign: 'center' }}>{transfer.school}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-                <h4 className="text-lg font-semibold mt-4 text-center">Players Drafted</h4>
-                <Table>
-                  <thead>
-                    <tr>
-                      <th>Player Name</th>
-                      <th>Round</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {record.playersDrafted.map((player, index) => (
-                      <tr key={index}>
-                        <td>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="font-medium">Heisman Winner</label>
                           <Input
-                            value={player.playerName}
-                            onChange={(e) => updateDraftedPlayer(index, 'playerName', e.target.value)}
+                            id="heisman"
+                            value={record.heisman}
+                            onChange={(e) => setRecord(prev => ({ ...prev, heisman: e.target.value }))}
+                            placeholder="Player Name"
                           />
-                        </td>
-                        <td>
-                          <Input
-                            value={player.round}
-                            onChange={(e) => updateDraftedPlayer(index, 'round', e.target.value)}
-                          />
-                        </td>
-                        <td>
-                          <Button onClick={() => removeDraftedPlayer(index)} variant="destructive" size="sm">
-                            Remove
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-                <Button onClick={addDraftedPlayer} className="w-full">Add Drafted Player</Button>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Team Rankings Summary */}
+                <Card>
+                  <CardContent className="pt-6">
+                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                      <Users className="h-5 w-5" />
+                      Team Rankings
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <label className="font-medium">Final Ranking</label>
+                        <Input
+                          id="finalRanking"
+                          value={record.finalRanking || ""}
+                          onChange={(e) => setRecord(prev => ({ ...prev, finalRanking: e.target.value }))}
+                          placeholder="#"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="font-medium">Recruiting Class</label>
+                        <Input
+                          id="classRanking"
+                          value={record.recruitingClassPlacement}
+                          onChange={(e) => setRecord(prev => ({ ...prev, recruitingClassPlacement: e.target.value }))}
+                          placeholder="#"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="font-medium">Conference Finish</label>
+                        <Input
+                          id="conferenceFinish"
+                          value={record.conferenceFinish || ""}
+                          onChange={(e) => setRecord(prev => ({ ...prev, conferenceFinish: e.target.value }))}
+                          placeholder="1st"
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </ScrollArea>
-          </div>
-        </div>
-        <div className="flex justify-center mt-6">
-          <Button onClick={handleSave}>Save</Button>
+          </TabsContent>
+          <TabsContent value="schedule" className="flex-grow">
+            <ScrollArea className="h-full p-4">
+              <Table>
+                <thead>
+                  <tr>
+                    <th className="w-16">Week</th>
+                    <th>Opponent</th>
+                    <th className="w-24">Result</th>
+                    <th className="w-24">Score</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {record.schedule.map((game, index) => (
+                    <tr key={index}>
+                      <td>{game.week}</td>
+                      <td>
+                        <Input
+                          value={game.opponent}
+                          onChange={(e) => updateSchedule(index, 'opponent', e.target.value)}
+                          placeholder="Team Name"
+                        />
+                      </td>
+                      <td>
+                        <Select
+                          value={game.result}
+                          onValueChange={(value) => updateSchedule(index, 'result', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="-" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Win">W</SelectItem>
+                            <SelectItem value="Loss">L</SelectItem>
+                            <SelectItem value="Tie">T</SelectItem>
+                            <SelectItem value="Bye">Bye</SelectItem>
+                            <SelectItem value="N/A">-</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </td>
+                      <td>
+                        <Input
+                          value={game.score}
+                          onChange={(e) => updateSchedule(index, 'score', e.target.value)}
+                          placeholder="00-00"
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </ScrollArea>
+          </TabsContent>
+
+          <TabsContent value="recruits" className="flex-grow">
+            <ScrollArea className="h-full p-4">
+              <div className="space-y-8">
+                <div>
+                  <h3 className="text-lg font-semibold mb-4 text-center">Recruits</h3>
+                  <Table>
+                    <thead>
+                      <tr>
+                        <th>Stars</th>
+                        <th>Name</th>
+                        <th>Position</th>
+                        <th>Rating</th>
+                        <th>Potential</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {record.recruits?.map((recruit, index) => (
+                        <tr key={index}>
+                          <td className="text-center">{recruit.stars} ★</td>
+                          <td className="text-center">{recruit.name}</td>
+                          <td className="text-center">{recruit.position}</td>
+                          <td className="text-center">{recruit.rating}</td>
+                          <td className="text-center">{recruit.potential}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-semibold mb-4 text-center">Transfers</h3>
+                  <Table>
+                    <thead>
+                      <tr>
+                        <th>Stars</th>
+                        <th>Name</th>
+                        <th>Position</th>
+                        <th>To / From</th>
+                        <th>School</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {record.transfers?.map((transfer, index) => (
+                        <tr key={index}>
+                          <td className="text-center">{transfer.stars} ★</td>
+                          <td className="text-center">{transfer.playerName}</td>
+                          <td className="text-center">{transfer.position}</td>
+                          <td className="text-center">{transfer.transferDirection}</td>
+                          <td className="text-center">{transfer.school}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </div>
+              </div>
+            </ScrollArea>
+          </TabsContent>
+
+          <TabsContent value="awards" className="flex-grow">
+            <ScrollArea className="h-full p-4">
+              <div className="space-y-8">
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Player Awards</h3>
+                  <Table>
+                    <thead>
+                      <tr>
+                        <th>Player</th>
+                        <th>Award</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {record.playerAwards?.map((award, index) => (
+                        <tr key={index}>
+                          <td className="text-center">{award.playerName}</td>
+                          <td className="text-center">{award.awardName}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Players Drafted</h3>
+                  <Table>
+                    <thead>
+                      <tr>
+                        <th>Player Name</th>
+                        <th>Round</th>
+                        <th className="w-48">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {record.playersDrafted.map((player, index) => (
+                        <tr key={index}>
+                          <td>
+                            <Input
+                              value={player.playerName}
+                              onChange={(e) => updateDraftedPlayer(index, 'playerName', e.target.value)}
+                              placeholder="Player Name"
+                            />
+                          </td>
+                          <td>
+                            <Input
+                              value={player.round}
+                              onChange={(e) => updateDraftedPlayer(index, 'round', e.target.value)}
+                              placeholder="Round #"
+                            />
+                          </td>
+                          <td>
+                            <div className="flex gap-2">
+                              <Button 
+                                onClick={() => saveDraftedPlayer(index)} 
+                                variant="default"
+                                size="sm"
+                                className="flex-1"
+                                disabled={!player.playerName || !player.round}
+                              >
+                                Save
+                              </Button>
+                              <Button 
+                                onClick={() => removeDraftedPlayer(index)} 
+                                variant="destructive" 
+                                size="sm"
+                                className="flex-1"
+                              >
+                                Remove
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                  <Button onClick={addDraftedPlayer} className="w-full mt-4">
+                    Add Drafted Player
+                  </Button>
+                </div>
+              </div>
+            </ScrollArea>
+          </TabsContent>
+        </Tabs>
+
+        <div className="flex justify-end gap-4 mt-6 px-4">
+          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button onClick={handleSave}>Save Changes</Button>
         </div>
       </DialogContent>
     </Dialog>
   );
 };
+
 export default YearRecordModal;
