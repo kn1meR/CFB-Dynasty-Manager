@@ -106,21 +106,32 @@ const AwardTracker: React.FC = () => {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <Select
-              value={newAward.playerName}
-              onValueChange={(value) => setNewAward({ ...newAward, playerName: value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select Player" />
-              </SelectTrigger>
-              <SelectContent>
-                {players.map(player => (
+          <Select
+            value={newAward.playerName}
+            onValueChange={(value) => setNewAward({ ...newAward, playerName: value })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select Player" />
+            </SelectTrigger>
+            <SelectContent>
+              {[...players]
+                .sort((a, b) => {
+                  // Convert jersey numbers to numbers for comparison
+                  const numA = parseInt(a.jerseyNumber);
+                  const numB = parseInt(b.jerseyNumber);
+                  // Handle cases where jersey number might be invalid
+                  if (isNaN(numA)) return 1;
+                  if (isNaN(numB)) return -1;
+                  return numA - numB;
+                })
+                .map(player => (
                   <SelectItem key={player.id} value={player.name}>
                     {player.name} - {player.position} #{player.jerseyNumber}
                   </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                ))
+              }
+            </SelectContent>
+          </Select>
 
             <Select
               value={newAward.awardName}
