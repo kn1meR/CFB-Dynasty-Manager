@@ -54,5 +54,6 @@ export const MESSAGES = {
   ADD_SUCCESS: 'Item added successfully',
   ADD_ERROR: 'Failed to add item',
   GENERIC_ERROR: 'An error occurred. Please try again.',
-  LOADING: 'Processing...'
+  LOADING: 'Processing...',
+  LOAD_ERROR: 'Error Loading!'
 } as const;
