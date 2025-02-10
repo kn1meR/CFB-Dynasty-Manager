@@ -1,3 +1,11 @@
+<p align="center">
+  <strong>LEAVE FEEDBACK AND REQUESTS IN THE DISCUSSION THREAD HERE:</strong><br>
+  <a href="https://github.com/kn1meR/CFB25-Dynasty-Manager/discussions/3">github.com/kn1meR/CFB25-Dynasty-Manager/discussions/3</a>
+</p>
+
+<br>
+<br>
+
 <ins>**Tutorial Video:**</ins>
 <div align="center">
   <a href="https://www.youtube.com/watch?v=-xD6pkTtBgU">
