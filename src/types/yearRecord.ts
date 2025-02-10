@@ -13,12 +13,14 @@ export interface YearRecord {
   pointsAgainst: string;
   natChamp: string;
   heisman: string;
-  schedule?: Game[];
+  schedule: Game[];
   recruits?: Recruit[];
   transfers?: Transfer[];
   playerAwards: Award[];
   recruitingClassPlacement: string;
   playersDrafted: DraftedPlayer[];
+  finalRanking?: string;
+  conferenceFinish?: string;
 }
 
 export interface YearStats {
