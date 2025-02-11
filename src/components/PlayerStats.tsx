@@ -169,6 +169,31 @@ const calculateQBR = (stats: PlayerStat): number => {
   return Number(rating.toFixed(1));
 };
 
+const getDefaultSortConfig = (category: StatCategory): SortConfig => {
+  switch (category) {
+    case 'Passing':
+      return { key: 'Pass Yards', direction: 'desc' };
+    case 'Rushing':
+      return { key: 'Rush Yards', direction: 'desc' };
+    case 'Receiving':
+      return { key: 'Rec Yards', direction: 'desc' };
+    case 'Blocking':
+      return { key: 'DP', direction: 'desc' };
+    case 'Defense':
+      return { key: 'Tackles', direction: 'desc' };
+    case 'Kicking':
+      return { key: 'FG Made', direction: 'desc' };
+    case 'Punting':
+      return { key: 'Punts', direction: 'desc' };
+    case 'Kick Return':
+      return { key: 'KR Yards', direction: 'desc' };
+    case 'Punt Return':
+      return { key: 'PR Yards', direction: 'desc' };
+    default:
+      return { key: '', direction: 'desc' };
+  }
+};
+
 const PlayerStats: React.FC = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [rosterPlayers] = useLocalStorage<RosterPlayer[]>('players', []);
@@ -182,11 +207,11 @@ const PlayerStats: React.FC = () => {
     category: 'Passing'
   });
 
-  const [sortConfig, setSortConfig] = useState<SortConfig | null>(null);
+  const [sortConfig, setSortConfig] = useState<SortConfig>(getDefaultSortConfig('Passing'));
 
-  const sortStats = (stats: PlayerStat[], sortConfig: SortConfig | null) => {
-    if (!sortConfig) return stats;
-
+  const sortStats = (stats: PlayerStat[], sortConfig: SortConfig) => {
+    if (!sortConfig.key) return stats;
+ 
     return [...stats].sort((a, b) => {
       const aValue = getStatValue(a, sortConfig.key);
       const bValue = getStatValue(b, sortConfig.key);
@@ -296,12 +321,12 @@ const PlayerStats: React.FC = () => {
 
   const getDisplayStats = () => {
     let filteredStats = playerStats.filter(stat => stat.category === selectedCategory);
-
+  
     if (viewType === 'Season') {
       return filteredStats.filter(stat => stat.year === currentYear);
     } else {
       const playerTotals: Record<string, PlayerStat> = {};
-
+  
       filteredStats.forEach(curr => {
         if (!playerTotals[curr.name]) {
           playerTotals[curr.name] = {
@@ -315,14 +340,24 @@ const PlayerStats: React.FC = () => {
           Object.entries(curr).forEach(([key, value]) => {
             if (typeof value === 'number' && key !== 'year') {
               const currentTotal = playerTotals[curr.name][key as keyof PlayerStat];
-              if (typeof currentTotal === 'number') {
-                playerTotals[curr.name][key as keyof PlayerStat] = currentTotal + value;
+              // Special handling for "long" fields - take the maximum value
+              if (key.toLowerCase().includes('long')) {
+                if (typeof currentTotal === 'number') {
+                  playerTotals[curr.name][key as keyof PlayerStat] = Math.max(currentTotal, value);
+                } else {
+                  playerTotals[curr.name][key as keyof PlayerStat] = value;
+                }
+              } else {
+                // For all other numeric fields, sum the values
+                if (typeof currentTotal === 'number') {
+                  playerTotals[curr.name][key as keyof PlayerStat] = currentTotal + value;
+                }
               }
             }
           });
         }
       });
-
+  
       return Object.values(playerTotals);
     }
   };
@@ -418,6 +453,7 @@ const PlayerStats: React.FC = () => {
 
         <Select value={selectedCategory} onValueChange={(value: StatCategory) => {
           setSelectedCategory(value);
+          setSortConfig(getDefaultSortConfig(value)); // Set default sort for new category
           setNewStat(prev => ({ ...prev, category: value, name: '' })); // Reset player selection when changing category
         }}>
           <SelectTrigger className="w-40">
