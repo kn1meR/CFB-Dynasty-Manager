@@ -51,32 +51,40 @@ const PlayerNameGenerator: React.FC = () => {
   };
 
   return (
-    <Card>
-      <CardContent>
-        <div className="flex items-center space-y-4">
-          <div className="flex items-center space-x-4 w-full">
-            <Label htmlFor="numNames">Number of names (max {MAX_NAMES}):</Label>
-            <Input
-              id="numNames"
-              type="number"
-              value={numNames}
-              onChange={(e) => setNumNames(Math.min(MAX_NAMES, Math.max(1, parseInt(e.target.value) || 1)))}
-              className="w-20"
-              min={1}
-              max={MAX_NAMES}
-            />
-            <Button onClick={generateNames} className="bg-blue-600 hover:bg-blue-700 ">Generate Names</Button>
-          </div>
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <div className="flex items-center gap-4">
+          <Label htmlFor="numNames" className="whitespace-nowrap">
+            Number of names (max {MAX_NAMES}):
+          </Label>
+          <Input
+            id="numNames"
+            type="number"
+            value={numNames}
+            onChange={(e) => setNumNames(Math.min(MAX_NAMES, Math.max(1, parseInt(e.target.value) || 1)))}
+            className="w-20"
+            min={1}
+            max={MAX_NAMES}
+          />
         </div>
-        <div className="space-y-2 mt-4">
+        <Button 
+          onClick={generateNames} 
+          className="w-full bg-blue-600 hover:bg-blue-700"
+        >
+          Generate Names
+        </Button>
+      </div>
+
+      {generatedNames.length > 0 && (
+        <div className="space-y-2">
           {generatedNames.map((name, index) => (
             <div key={index} className="p-2 bg-secondary rounded">
               {name}
             </div>
           ))}
         </div>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
 };
 
