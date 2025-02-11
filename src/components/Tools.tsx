@@ -18,23 +18,26 @@ const Tools: React.FC = () => {
       <h1 className="text-3xl font-bold text-center">Dynasty Tools</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-      <Card>
-          <CardHeader className="text-xl justify-between font-semibold">Recruiting Predictor - @MaxPlaysCFB</CardHeader>
+        <Card>
+          <CardHeader className="text-xl justify-between font-semibold">
+            Recruiting Predictor - @MaxPlaysCFB
+          </CardHeader>
           <CardContent>
             <RecruitPredictor />
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="text-xl justify-between font-semibold">Recruiting Calculator - @MaxPlaysCFB</CardHeader>
+          <CardHeader className="text-xl justify-between font-semibold">
+            Recruiting Calculator - @MaxPlaysCFB
+          </CardHeader>
           <CardContent>
             <RecruitingCalculator />
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="text-xl font-semibold flex items-center">
+          <CardHeader className="text-xl justify-between font-semibold">
             Player Name Generator
           </CardHeader>
           <CardContent>
@@ -43,13 +46,13 @@ const Tools: React.FC = () => {
         </Card>
 
         <Card>
-          <CardHeader className="text-xl justify-between font-semibold">Import / Export</CardHeader>
-         <CardContent>
+          <CardHeader className="text-xl justify-between font-semibold">
+            Import / Export
+          </CardHeader>
+          <CardContent>
             <DataControls />
           </CardContent>
-      </Card>
-
-        {/* ... other tool cards ... */}
+        </Card>
       </div>
     </div>
   );
