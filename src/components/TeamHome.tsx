@@ -11,6 +11,8 @@ import { toast } from 'react-hot-toast';
 import { Calendar, GraduationCap, User } from 'lucide-react';
 import { Game, YearStats } from '@/types/yearRecord';
 import { PlayerStat } from '@/types/playerStats';
+import { Player } from '@/types/playerTypes';
+import TeamOverviewCard from '@/components/TeamOverviewCard';
 
 interface LocationRecord {
   wins: number;
@@ -29,6 +31,7 @@ const TeamHome: React.FC = () => {
   const router = useRouter();
   const [currentYear, setYear] = useState<number>(2024); // Start with default
   const [currentSchedule, setCurrentSchedule] = useState<Game[]>([]);
+  const [players, setPlayers] = useState<Player[]>([]);
   const [yearStats, setCurrentYearStats] = useState<YearStats>({
     wins: 0,
     losses: 0,
@@ -91,6 +94,11 @@ const TeamHome: React.FC = () => {
         setCurrentYearStats(stats);
         const leaders = getStatLeaders();
         setStatLeaders(leaders);
+        const storedPlayers = localStorage.getItem('players');
+        if (storedPlayers) {
+          setPlayers(JSON.parse(storedPlayers));
+        }
+
         setIsLoading(false);
       } catch (error) {
         console.error('Error loading data:', error);
@@ -222,6 +230,8 @@ const TeamHome: React.FC = () => {
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold text-center">Team Dashboard • {currentYear}</h1>
+
+      <TeamOverviewCard players={players} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card>
