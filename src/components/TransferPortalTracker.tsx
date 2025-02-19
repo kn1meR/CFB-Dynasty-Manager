@@ -119,7 +119,7 @@ const TransferPortalTracker: React.FC = () => {
               </SelectTrigger>
               <SelectContent>
                 {starOptions.map(stars => (
-                  <SelectItem key={stars} value={stars}>{stars} ★</SelectItem>
+                  <SelectItem key={stars} value={stars}>{stars} ⭐</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -195,7 +195,7 @@ const TransferPortalTracker: React.FC = () => {
               {transfersForSelectedYear.map(transfer => (
                 <tr key={transfer.id}>
                   <td className="text-center">{transfer.playerName}</td>
-                  <td className="text-center">{transfer.stars} ★</td>
+                  <td className="text-center">{transfer.stars} ⭐</td>
                   <td className="text-center">{transfer.position}</td>
                   <td className="text-center">{transfer.transferDirection}</td>
                   <td className="text-center">{transfer.school}</td>
