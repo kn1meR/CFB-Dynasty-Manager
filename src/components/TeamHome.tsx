@@ -402,7 +402,7 @@ const TeamHome: React.FC = () => {
                   <span className="text-4xl font-bold">
                     {currentSchedule.filter(game => game.result !== 'N/A').length}/{currentSchedule.length}
                   </span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400 mt-1">Games Played</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400 mt-1">Current Week</span>
                 </div>
               </div>
             </div>
