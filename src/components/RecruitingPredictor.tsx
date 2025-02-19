@@ -25,11 +25,11 @@ const positions = [
 ];
 
 const stars = [
-  { label: '5 Stars', value: 25.44 },
-  { label: '4 Stars', value: 22.14 },
-  { label: '3 Stars', value: 14.38 },
-  { label: '2 Stars', value: 6.98 },
-  { label: '1 Star', value: 0 }
+  { label: '5 ⭐', value: 25.44 },
+  { label: '4 ⭐', value: 22.14 },
+  { label: '3 ⭐', value: 14.38 },
+  { label: '2 ⭐', value: 6.98 },
+  { label: '1 ⭐', value: 0 }
 ];
 
 const RecruitPredictor = () => {
