@@ -40,6 +40,7 @@
     }
   },
   "dependencies": {
+    "@lucide/lab": "^0.1.2",
     "@radix-ui/react-alert-dialog": "^1.1.1",
     "@radix-ui/react-dialog": "^1.1.1",
     "@radix-ui/react-label": "^2.1.0",
@@ -53,15 +54,17 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
-    "command": "^0.0.5",
+    "command": "^0.0.1",
     "electron-serve": "^2.0.0",
     "electron-store": "^10.0.0",
+    "file-saver": "^2.0.5",
     "fix-esm": "^1.0.1",
     "framer-motion": "^11.5.4",
     "lucide-react": "^0.417.0",
-    "next": "14.2.5",
-    "next-pwa": "^5.6.0",
+    "next": "^14.2.24",
+    "next-pwa": "^2.0.2",
     "next-themes": "^0.3.0",
+    "papaparse": "^5.5.2",
     "react": "^18",
     "react-dom": "^18",
     "react-hot-toast": "^2.4.1",
@@ -74,7 +77,9 @@
     "theme-ui": "^0.16.2"
   },
   "devDependencies": {
+    "@types/file-saver": "^2.0.7",
     "@types/node": "^20",
+    "@types/papaparse": "^5.3.15",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/tesseract.js": "^2.0.0",
