@@ -95,7 +95,7 @@ const RecruitingClassTracker: React.FC = () => {
               </SelectTrigger>
               <SelectContent>
                 {starOptions.map(stars => (
-                  <SelectItem key={stars} value={stars}>{stars} ★</SelectItem>
+                  <SelectItem key={stars} value={stars}>{stars} ⭐</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -164,7 +164,7 @@ const RecruitingClassTracker: React.FC = () => {
               {recruitsForSelectedYear.map(recruit => (
                 <tr key={recruit.id}>
                   <td className="text-center">{recruit.name}</td>
-                  <td className="text-center">{recruit.stars} ★</td>
+                  <td className="text-center">{recruit.stars} ⭐</td>
                   <td className="text-center">{recruit.position}</td>
                   <td className="text-center">{recruit.rating}</td>
                   <td className="text-center">{recruit.potential}</td>
