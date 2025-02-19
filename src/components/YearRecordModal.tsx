@@ -456,7 +456,7 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
                     <tbody>
                       {record.recruits?.map((recruit, index) => (
                         <tr key={index}>
-                          <td className="text-center">{recruit.stars} ★</td>
+                          <td className="text-center">{recruit.stars} ⭐</td>
                           <td className="text-center">{recruit.name}</td>
                           <td className="text-center">{recruit.position}</td>
                           <td className="text-center">{recruit.rating}</td>
@@ -482,7 +482,7 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
                     <tbody>
                       {record.transfers?.map((transfer, index) => (
                         <tr key={index}>
-                          <td className="text-center">{transfer.stars} ★</td>
+                          <td className="text-center">{transfer.stars} ⭐</td>
                           <td className="text-center">{transfer.playerName}</td>
                           <td className="text-center">{transfer.position}</td>
                           <td className="text-center">{transfer.transferDirection}</td>
