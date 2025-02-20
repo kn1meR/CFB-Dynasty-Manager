@@ -10,11 +10,10 @@ export const ThemeToggle = memo(() => {
   const { setTheme, theme } = useTheme()
 
   return (
-    <Button variant="outline" size="icon" onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
-      <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-      <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-      <span className="sr-only">Toggle theme</span>
-    </Button>
+    <Button variant="outline" size="icon" onClick={() => setTheme(theme === "light" ? "dark" : "light")} className="relative h-10 w-10 dark:bg-white dark:text-black dark:hover:bg-gray-200 bg-gray-900 text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background">
+        <Sun className="h- w-5 absolute rotate-90 scale-0 transition-all duration-300 ease-in-out dark:rotate-0 dark:scale-100" />
+        <Moon className="h-5 w-5 absolute rotate-0 scale-100 transition-all duration-300 ease-in-out dark:-rotate-90 dark:scale-0" />
+      </Button>
   )
 })
 
