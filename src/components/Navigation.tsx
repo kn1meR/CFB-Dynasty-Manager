@@ -21,17 +21,15 @@ const Navigation: React.FC = memo(() => {
     { name: 'Season Stats', path: '/records' },
     { name: 'Player Awards', path: '/awards' },
     { name: 'Trophy Case', path: '/trophy-case' },
+    //{ name: 'Coach Stats', path: '/coach-stats' },
     { name: 'Tools', path: '/tools' }
   ];
 
   return (
-    <nav className="w-full bg-gray-800 text-white">
+    <nav className="w-full bg-gray-300 dark:bg-gray-800 text-white">
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
-            <div className="flex-shrink-0 flex items-center">
-              {/* You can add a logo here if desired */}
-            </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
               {navItems.map((item) => (
                 <Link
@@ -39,9 +37,9 @@ const Navigation: React.FC = memo(() => {
                   href={item.path}
                   className={`${
                     pathname === item.path
-                      ? 'border-blue-500 text-white'
-                      : 'border-transparent text-gray-300 hover:border-gray-300 hover:text-white'
-                  } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+                      ? 'border-blue-500 text-blue-900 dark:text-white'
+                      : 'border-transparent text-gray-900 dark:text-gray-300 hover:border-gray-300 hover:text-blue-300'
+                  } inline-flex items-center px-2 pt-1 border-b-4 text-sm font-medium`}
                 >
                   {item.name}
                 </Link>
