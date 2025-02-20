@@ -66,7 +66,6 @@ const CoachProfile = () => {
       setIsConfirmingReset(false);
       setIsEditing(false);
       
-      // Reopen dialog after a brief delay
       setTimeout(() => {
         setIsEditing(true);
       }, 100);
@@ -82,29 +81,31 @@ const CoachProfile = () => {
     <>
       <Button
         variant="ghost"
-        className="flex items-center space-x-2"
+        className="flex items-center space-x-2 transition-colors duration-200 hover:bg-accent hover:text-accent-foreground dark:text-gray-200 dark:hover:bg-gray-700"
         onClick={() => setIsEditing(true)}
       >
-        <User size={18} />
-        <span className={profile.coachName ? "" : "text-gray-400"}>
+        <User className="h-4 w-5 text-primary dark:text-gray-400" />
+        <span className={`text-base font-medium ${profile.coachName ? "text-primary dark:text-gray-200" : "text-muted-foreground"}`}>
           {profile.coachName || 'Coach Name'}
         </span>
-        <School size={18} />
-        <span className={profile.schoolName ? "" : "text-gray-400"}>
+        <School className="h-4 w-5 text-primary dark:text-gray-400" />
+        <span className={`text-base font-medium ${profile.schoolName ? "text-primary dark:text-gray-200" : "text-muted-foreground"}`}>
           {profile.schoolName || 'School'}
         </span>
-        <Calendar size={18} />
-        <span>{profile.currentYear}</span>
+        <Calendar className="h-4 w-5 text-primary dark:text-gray-400" />
+        <span className="text-base font-medium text-primary dark:text-gray-200">
+          {profile.currentYear}
+        </span>
       </Button>
 
       <Dialog open={isEditing} onOpenChange={setIsEditing}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[425px] dark:bg-gray-800 dark:border-gray-700">
           <DialogHeader>
-            <DialogTitle>Edit Profile</DialogTitle>
+            <DialogTitle className="text-xl font-semibold dark:text-gray-100">Edit Profile</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-6 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="coachName" className="text-right">
+              <Label htmlFor="coachName" className="text-right dark:text-gray-300">
                 Coach Name
               </Label>
               <Input
@@ -112,30 +113,39 @@ const CoachProfile = () => {
                 value={profile.coachName}
                 onChange={(e) => setProfile({ ...profile, coachName: e.target.value })}
                 placeholder="Coach Name"
-                className="col-span-3"
+                className="col-span-3 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-400 select-none"
                 autoComplete="off"
+                autoFocus={false}
+                onSelect={(e) => e.preventDefault()}
+                onClick={(e) => e.currentTarget.setSelectionRange(e.currentTarget.value.length, e.currentTarget.value.length)}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="schoolName" className="text-right">
+              <Label htmlFor="schoolName" className="text-right dark:text-gray-300">
                 School
               </Label>
               <Select
                 value={profile.schoolName}
                 onValueChange={(value) => setProfile({ ...profile, schoolName: value })}
               >
-                <SelectTrigger className="col-span-3">
+                <SelectTrigger className="col-span-3 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                   <SelectValue placeholder="School" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
                   {fbsTeams.map(team => (
-                    <SelectItem key={team.name} value={team.name}>{team.name}</SelectItem>
+                    <SelectItem 
+                      key={team.name} 
+                      value={team.name}
+                      className="dark:text-gray-100 dark:focus:bg-gray-700"
+                    >
+                      {team.name}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="currentYear" className="text-right">
+              <Label htmlFor="currentYear" className="text-right dark:text-gray-300">
                 Current Year
               </Label>
               <Input
@@ -143,35 +153,51 @@ const CoachProfile = () => {
                 type="number"
                 value={profile.currentYear}
                 onChange={(e) => setProfile({ ...profile, currentYear: parseInt(e.target.value, 10) })}
-                className="col-span-3"
+                className="col-span-3 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
                 min={2024}
                 max={2054}
               />
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="gap-2">
             <AlertDialog open={isConfirmingReset} onOpenChange={setIsConfirmingReset}>
               <AlertDialogTrigger asChild>
-                <Button variant="outline">Reset Data</Button>
+                <Button 
+                  variant="outline"
+                  className="dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600"
+                >
+                  Reset Data
+                </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent>
+              <AlertDialogContent className="dark:bg-gray-800 dark:border-gray-700">
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
+                  <AlertDialogTitle className="dark:text-gray-100">Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription className="dark:text-gray-300">
                     This will reset all application data and cannot be undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel onClick={() => setIsConfirmingReset(false)}>
+                  <AlertDialogCancel 
+                    className="dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600"
+                    onClick={() => setIsConfirmingReset(false)}
+                  >
                     Cancel
                   </AlertDialogCancel>
-                  <AlertDialogAction onClick={handleReset}>
+                  <AlertDialogAction
+                    className="dark:bg-red-600 dark:hover:bg-red-700 dark:text-white"
+                    onClick={handleReset}
+                  >
                     Reset Data
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-            <Button onClick={handleSave}>Save Changes</Button>
+            <Button 
+              onClick={handleSave}
+              className="dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
+            >
+              Save Changes
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
