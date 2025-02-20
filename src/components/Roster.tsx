@@ -18,6 +18,7 @@ import { Label } from '@/components/ui/label';
 import { Pencil, Trash2, Download } from 'lucide-react';
 import { saveAs } from 'file-saver';
 import Papa from 'papaparse';
+import RosterCSVImport from './RosterCSVImport';
 
 interface Player {
   id: number;
@@ -46,6 +47,7 @@ const yearOrder: { [key: string]: number } = {
 const devTraitOrder: { [key: string]: number } = {
   'Normal': 0, 'Impact': 1, 'Star': 2, 'Elite': 3
 };
+
 
 const Roster: React.FC = () => {
   const [players, setPlayers] = useLocalStorage<Player[]>('players', []);
@@ -104,6 +106,16 @@ const Roster: React.FC = () => {
   const [hoveredColumn, setHoveredColumn] = useState<number | null>(null);
 
   const [isOpen, setIsOpen] = useState(false);
+
+  const handleImportComplete = (importedPlayers: Omit<Player, 'id'>[]) => {
+    setPlayers((prevPlayers: Player[]) => [
+      ...prevPlayers,
+      ...importedPlayers.map(player => ({
+        ...player,
+        id: Date.now() + Math.random(),
+      }))
+    ]);
+  };
 
   const sortedPlayers = [...filteredPlayers].sort((a, b) => {
     if (sortConfig.field === 'jersey #') {
@@ -272,10 +284,12 @@ const Roster: React.FC = () => {
                 variant="outline"
                 className="flex gap-2"
               >
-                <Download className="h-4 w-8" />
+                <Download className="h-4 w-4" />
                 Export Roster
               </Button>
+              <RosterCSVImport onImportComplete={handleImportComplete} />
             </div>
+            
           </div>
         </CardHeader>
 
