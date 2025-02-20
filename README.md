@@ -22,7 +22,7 @@
 4. Team Dashboard - See relevant team data at a quick glance.
 5. Schedule - Win/Loss/Tie and Score Tracker. Will automatically update record and points for/against in team dashboard & year stats.
 6. Top 25 - Allows for user input of the Top 25 teams week by week.  Will show movement of teams via green and red arrows. 
-7. Roster - Allows for roster input with jersey #, name, position, year, overall, dev. trait and notes. sortable by all fields (except notes).  Can also export Roster to CSV!
+7. Roster - Allows for roster input with jersey #, name, position, year, overall, dev. trait and notes. sortable by all fields (except notes).  Can also import and export Roster via CSV!
 
    **BETA:** **UPLOAD SCREENSHOTS TO HAVE ROSTER AUTO ADDED** 
 8. Recruiting Class Tracker - Enter recruits' name, star rating, position, rating, and potential. Automatically tracked and stored year over year for easy viewability in the future.
