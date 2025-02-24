@@ -12,6 +12,10 @@ import { Recruit } from '@/types/playerTypes';
 import { generalPositions } from '@/types/playerTypes';
 import { notifySuccess, notifyError, MESSAGES } from '@/utils/notification-utils';
 
+interface DevTraitBadgeProps {
+  trait: 'Normal' | 'Impact' | 'Star' | 'Elite';
+}
+
 const potentials = ['Elite', 'Star', 'Impact', 'Normal'];
 const starOptions = ['5', '4', '3', '2', '1'];
 
@@ -29,6 +33,21 @@ const RecruitingClassTracker: React.FC = () => {
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
 
   const recruitsForSelectedYear = allRecruits.filter(recruit => recruit.recruitedYear === selectedYear);
+
+    const DevTraitBadge: React.FC<DevTraitBadgeProps> = ({ trait }) => {
+      const colors = {
+        'Elite': 'bg-red-400 text-purple-100 dark:bg-red-700 dark:text-purple-0',
+        'Star': 'bg-yellow-500 text-yellow-900 dark:bg-yellow-500 dark:text-black',
+        'Impact': 'bg-gray-400 text-gray-100 dark:bg-gray-600 dark:text-green-0',
+        'Normal': 'bg-yellow-800 text-gray-100 dark:bg-yellow-900 dark:text-gray-0'
+      } as const;
+  
+      return (
+        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm/6 font-medium ${colors[trait]}`}>
+          {trait}
+        </span>
+      );
+    };
 
   const addRecruit = () => {
     const recruitToAdd = {
@@ -167,7 +186,7 @@ const RecruitingClassTracker: React.FC = () => {
                   <td className="text-center">{recruit.stars} ⭐</td>
                   <td className="text-center">{recruit.position}</td>
                   <td className="text-center">{recruit.rating}</td>
-                  <td className="text-center">{recruit.potential}</td>
+                  <td className="text-center"><DevTraitBadge trait={recruit.potential as 'Elite' | 'Star' | 'Impact' | 'Normal'} /></td>
                   <td className="text-center">
                     <div className="flex justify-center space-x-2">
                       <Button onClick={() => startEditing(recruit)} size="sm">Edit</Button>
