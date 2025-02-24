@@ -28,7 +28,7 @@ const Top25Rankings: React.FC<Props> = ({ currentWeek }) => {
       previousRank: null
     }))
   );
-  
+
   const [draggedTeam, setDraggedTeam] = useState<number | null>(null);
 
   // Used for optimizing SelectItem rendering
@@ -78,10 +78,10 @@ const Top25Rankings: React.FC<Props> = ({ currentWeek }) => {
     setRankings(prev => {
       const newRankings = [...prev];
       const [movedTeam] = newRankings.splice(draggedTeam, 1);
-      
+
       // Store the original index before moving
       movedTeam.previousRank = draggedTeam + 1;
-      
+
       // Insert at new position
       newRankings.splice(targetIndex, 0, movedTeam);
 
@@ -105,10 +105,10 @@ const Top25Rankings: React.FC<Props> = ({ currentWeek }) => {
 
   const renderRankingChange = useCallback((team: RankedTeam, currentIndex: number) => {
     if (!team.previousRank || !team.name) return null;
-    
+
     const diff = team.previousRank - (currentIndex + 1);
     if (diff === 0) return <div className="text-gray-500">-</div>;
-    
+
     return diff > 0 ? (
       <div className="text-green-500 flex items-center">
         <ArrowUp size={16} />{diff}
@@ -145,17 +145,16 @@ const Top25Rankings: React.FC<Props> = ({ currentWeek }) => {
       onDragOver={handleDragOver}
       onDrop={(e) => handleDrop(e, index)}
       onDragEnd={handleDragEnd}
-      className={`flex items-center space-x-2 p-2 rounded transition-colors duration-150 ${
-        draggedTeam === index ? 'bg-gray-100' : 'hover:bg-gray-50'
-      } ${team.name ? 'cursor-move' : 'cursor-default'} touch-manipulation`}
+      className={`flex items-center space-x-2 p-2 rounded transition-colors duration-150 ${draggedTeam === index ? 'bg-gray-100' : 'hover:bg-gray-50'
+        } ${team.name ? 'cursor-move' : 'cursor-default'} touch-manipulation`}
       role="listitem"
       aria-label={`Rank ${index + 1}: ${team.name || 'Unranked'}`}
     >
       <div className="flex items-center space-x-2 flex-1">
         <GripVertical size={16} className={`${team.name ? 'text-gray-400' : 'text-gray-200'} touch-manipulation`} />
         <div className="font-semibold w-8 text-right">{index + 1}.</div>
-        <Select 
-          value={team.name || "unranked"} 
+        <Select
+          value={team.name || "unranked"}
           onValueChange={(value) => updateTeam(index, value)}
         >
           <SelectTrigger className="w-40">
@@ -164,8 +163,8 @@ const Top25Rankings: React.FC<Props> = ({ currentWeek }) => {
           <SelectContent>
             <SelectItem value="unranked">Unranked</SelectItem>
             {fbsTeams.map((team) => (
-              <SelectItem 
-                key={team.name} 
+              <SelectItem
+                key={team.name}
                 value={team.name}
                 disabled={rankedTeamsMap.has(team.name) && rankedTeamsMap.get(team.name) !== index}
               >
@@ -182,9 +181,9 @@ const Top25Rankings: React.FC<Props> = ({ currentWeek }) => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Top 25 Rankings</h1>
-        <Button 
-          variant="outline" 
+        <h1 className="text-3xl font-bold mx-auto">Top 25 Rankings</h1>
+        <Button
+          variant="outline"
           onClick={saveRankings}
           className="flex items-center gap-2"
         >
