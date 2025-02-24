@@ -192,7 +192,7 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="max-w-[80vw] w-full max-h-[90vh] flex flex-col p-0">
         <DialogHeader className="p-4 border-b">
-          <DialogTitle className="text-2xl font-bold text-center">{year} Season Record</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-center">{year} Season Recap</DialogTitle>
         </DialogHeader>
 
         <div className="flex-1 overflow-hidden">
