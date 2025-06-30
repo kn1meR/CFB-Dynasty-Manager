@@ -1,6 +1,6 @@
 <p align="center">
   <strong>LEAVE FEEDBACK AND REQUESTS IN THE DISCUSSION THREAD HERE:</strong><br>
-  <a href="https://github.com/kn1meR/CFB-Dynasty-Manager/discussions">github.com/kn1meR/CFB25-Dynasty-Manager/discussions/3</a>
+  <a href="https://github.com/kn1meR/CFB-Dynasty-Manager/discussions">github.com/kn1meR/CFB-Dynasty-Manager/discussions</a>
 </p>
 
 <br>
