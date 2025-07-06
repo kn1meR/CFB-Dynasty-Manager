@@ -23,7 +23,7 @@
 17. Coach Profile - Can edit team colors, coach name, year, school!
 18. Manual Save - There is an autosave feature, but make sure to manually save before you close the app to be sure!
 
-<ins>**HOW TO USE:**</ins>
+<ins>**HOW TO USE:**</ins><br>
 *If you have used this before, run `npm ci`.  This will perform a clean install of the node_modules!*
 
 1. First you need to verify that you have [`node.js`](https://nodejs.org/en/download/package-manager/current) on your device. You can install it from the linked website, but if you want to check if you have it already, load up your device's terminal/console and type in `node -v`
