@@ -1,0 +1,279 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 0.5rem;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.table-hover-row:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.dark .table-hover-row:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.table-hover-cell {
+  position: relative;
+}
+
+.table-hover-cell::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: transparent;
+  transition: background-color 0.2s ease;
+}
+
+.table-hover-cell:hover::after {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.dark .table-hover-cell:hover::after {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Enhanced School Colors CSS - Add to globals.css */
+
+/* School Color CSS Custom Properties are already set by CoachProfile.tsx:
+   --school-primary
+   --school-secondary  
+   --school-accent
+   --school-primary-hover
+   --school-primary-light
+   --school-secondary-light
+*/
+
+/* Apply school colors to primary buttons */
+.btn-school-primary {
+  background-color: var(--school-primary);
+  color: white;
+  border: 1px solid var(--school-primary);
+  transition: all 0.2s ease;
+}
+
+.btn-school-primary:hover {
+  background-color: var(--school-primary-hover);
+  border-color: var(--school-primary-hover);
+}
+
+/* Apply school colors to secondary buttons */
+.btn-school-secondary {
+  background-color: var(--school-secondary);
+  color: white;
+  border: 1px solid var(--school-secondary);
+  transition: all 0.2s ease;
+}
+
+.btn-school-secondary:hover {
+  background-color: var(--school-secondary-light);
+  border-color: var(--school-secondary-light);
+}
+
+/* Apply school colors to accent elements */
+.accent-school {
+  color: var(--school-accent);
+}
+
+.bg-school-accent {
+  background-color: var(--school-accent);
+}
+
+/* School colored borders */
+.border-school-primary {
+  border-color: var(--school-primary);
+}
+
+.border-school-secondary {
+  border-color: var(--school-secondary);
+}
+
+/* Navigation and header styling with school colors */
+.nav-school-themed {
+  border-left: 4px solid var(--school-primary);
+}
+
+/* Card headers with school color accents */
+.card-header-school {
+  border-bottom: 2px solid var(--school-primary);
+  background: linear-gradient(90deg, var(--school-primary)10, transparent 100%);
+}
+
+/* Stats cards with school color theming */
+.stat-card-school {
+  border-top: 3px solid var(--school-primary);
+}
+
+/* Table headers with school colors */
+.table-header-school {
+  background: linear-gradient(135deg, var(--school-primary) 0%, var(--school-secondary) 100%);
+  color: white;
+}
+
+/* Progress bars and indicators */
+.progress-school {
+  background-color: var(--school-primary);
+}
+
+/* Links and interactive elements */
+.link-school {
+  color: var(--school-primary);
+  transition: color 0.2s ease;
+}
+
+.link-school:hover {
+  color: var(--school-primary-hover);
+}
+
+/* Badges and labels */
+.badge-school-primary {
+  background-color: var(--school-primary);
+  color: white;
+}
+
+.badge-school-secondary {
+  background-color: var(--school-secondary);
+  color: white;
+}
+
+/* Form focus states */
+.input-school-focus:focus {
+  border-color: var(--school-primary);
+  box-shadow: 0 0 0 2px var(--school-primary)20;
+}
+
+/* Active states for navigation */
+.nav-active-school {
+  background-color: var(--school-primary)10;
+  border-left: 4px solid var(--school-primary);
+}
+
+/* Specific component styling */
+.roster-row-hover:hover {
+  background-color: var(--school-primary)05;
+}
+
+/* Schedule game result styling */
+.game-win {
+  border-left: 4px solid var(--school-primary);
+  background-color: var(--school-primary)08;
+}
+
+.game-loss {
+  border-left: 4px solid var(--school-secondary);
+  background-color: var(--school-secondary)08;
+}
+
+/* Player stats table styling */
+.stats-leader {
+  background: linear-gradient(90deg, var(--school-primary)15 0%, transparent 100%);
+  border-left: 3px solid var(--school-primary);
+}
+
+/* Trophy and awards styling */
+.trophy-school {
+  color: var(--school-accent);
+  background: linear-gradient(135deg, var(--school-primary)10 0%, var(--school-secondary)10 100%);
+}
+
+/* Recruiting class styling */
+.recruit-card {
+  border-top: 2px solid var(--school-accent);
+}
+
+/* Dashboard stat boxes */
+.dashboard-stat-primary {
+  background: linear-gradient(135deg, var(--school-primary) 0%, var(--school-primary-hover) 100%);
+  color: white;
+}
+
+.dashboard-stat-secondary {
+  background: linear-gradient(135deg, var(--school-secondary) 0%, var(--school-secondary-light) 100%);
+  color: white;
+}
+
+/* Dark mode adjustments */
+.dark .btn-school-primary {
+  background-color: var(--school-primary);
+  border-color: var(--school-primary);
+}
+
+.dark .btn-school-secondary {
+  background-color: var(--school-secondary);
+  border-color: var(--school-secondary);
+}
+
+/* --- MODIFICATION START --- */
+/* Hide the Next.js Route Announcer for screen readers */
+#__next-route-announcer {
+  display: none;
+}
+/* --- MODIFICATION END --- */
