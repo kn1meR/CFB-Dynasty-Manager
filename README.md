@@ -21,6 +21,7 @@
 15. Social Media - A tab with a social media feed centered around your dynasty!
 16. Tools - Recruiting tools to give overall estimates, if you should Hard Sell or not, a Random Name Generator, and an Export function for saving progress!
 17. Coach Profile - Can edit team colors, coach name, year, school!
+18. Manual Save - There is an autosave feature, but make sure to manually save before you close the app to be sure!
 
 
 <ins>**HOW TO USE:**</ins>
@@ -37,6 +38,7 @@
 
 
 <ins>**SCREENSHOTS:**</ins>
+
 ![2](https://github.com/user-attachments/assets/bb267b5a-e959-477a-a361-cff78f0b5123)
 ![3](https://github.com/user-attachments/assets/7699d911-7a6c-4055-a9f4-867a384758f8)
 ![4](https://github.com/user-attachments/assets/7058e47e-656d-45d9-ab84-78a3f4a30134)
