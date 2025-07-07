@@ -44,8 +44,8 @@ function createWindow() {
   let startUrl;
 
   if (isDev) {
-    startUrl = "http://localhost:3000";
-    console.log("Development mode detected - connecting to localhost:3000");
+    startUrl = "http://localhost:3001";
+    console.log("Development mode detected - connecting to localhost:3001");
   } else {
     const indexPath = path.join(__dirname, "../out/index.html");
     startUrl = `file://${indexPath}`;
@@ -108,10 +108,10 @@ function createWindow() {
               <div class="container">
                 <h1>🏈 Dynasty Manager - Development</h1>
                 <p>Unable to connect to the development server.</p>
-                <div class="error">Make sure the Next.js development server is running on localhost:3000</div>
+                <div class="error">Make sure the Next.js development server is running on localhost:3001</div>
                 <p>Please run <code>npm run dev</code> in a separate terminal first.</p>
                 <button onclick="location.reload()">Retry Connection</button>
-                <button onclick="require('electron').shell.openExternal('http://localhost:3000')">Open in Browser</button>
+                <button onclick="require('electron').shell.openExternal('http://localhost:3001')">Open in Browser</button>
               </div>
             </body>
           </html>

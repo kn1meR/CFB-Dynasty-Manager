@@ -1,5 +1,5 @@
 // src/utils/logoUtils.ts
-import { fbsTeams } from './fbsTeams';
+import { fbsTeams } from "./fbsTeams";
 
 // Logo cache to prevent redundant requests
 const logoCache = new Map<string, string>();
@@ -14,7 +14,7 @@ function testImagePath(path: string): Promise<boolean> {
     img.onload = () => resolve(true);
     img.onerror = () => resolve(false);
     img.src = path;
-    
+
     // Add timeout to prevent hanging
     setTimeout(() => resolve(false), 3000);
   });
@@ -23,37 +23,49 @@ function testImagePath(path: string): Promise<boolean> {
 /**
  * Optimized function that stops searching after first successful logo
  */
-export async function getOptimizedTeamLogoPath(teamName: string): Promise<string> {
+export async function getOptimizedTeamLogoPath(
+  teamName: string
+): Promise<string> {
   // Check cache first
   const cacheKey = teamName.toLowerCase();
   if (logoCache.has(cacheKey)) {
     return logoCache.get(cacheKey)!;
   }
 
-  const team = fbsTeams.find(t => 
-    t.name === teamName || 
-    t.name.toLowerCase() === teamName.toLowerCase() ||
-    t.abbrev === teamName
+  const team = fbsTeams.find(
+    (t) =>
+      t.name === teamName ||
+      t.name.toLowerCase() === teamName.toLowerCase() ||
+      t.abbrev === teamName
   );
-  
+
   let logoPaths: string[];
-  
+
   if (!team) {
     // Fallback for custom teams
-    const sanitizedName = teamName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+    const sanitizedName = teamName
+      .replace(/\s+/g, "_")
+      .replace(/[^a-zA-Z0-9_]/g, "");
     logoPaths = [
       `/logos/${sanitizedName}_300x300.png`,
       `/logos/${sanitizedName}_logo_300x300.png`,
-      `/logos/${teamName.replace(/\s+/g, '_')}-300x300.png`
+      `/logos/${teamName.replace(/\s+/g, "_")}-300x300.png`,
     ];
   } else {
-    const schoolName = team.name.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_&]/g, '');
-    const teamNickname = team.nickName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_&]/g, '');
-    
+    const schoolName = team.name
+      .replace(/\s+/g, "_")
+      .replace(/[^a-zA-Z0-9_&]/g, "");
+    const teamNickname = team.nickName
+      .replace(/\s+/g, "_")
+      .replace(/[^a-zA-Z0-9_&]/g, "");
+
     logoPaths = [
       `/logos/${schoolName}_${teamNickname}_300x300.png`,
       `/logos/${schoolName}_${teamNickname}_logo_300x300.png`,
-      `/logos/${team.name.replace(/\s+/g, '_')}_${team.nickName.replace(/\s+/g, '_')}_300x300.png`
+      `/logos/${team.name.replace(/\s+/g, "_")}_${team.nickName.replace(
+        /\s+/g,
+        "_"
+      )}_300x300.png`,
     ];
   }
 
@@ -88,23 +100,30 @@ export async function getOptimizedTeamLogoPath(teamName: string): Promise<string
  */
 export function getTeamLogoPath(teamName: string): string {
   // Handle special cases and find the team data
-  const team = fbsTeams.find(t => 
-    t.name === teamName || 
-    t.name.toLowerCase() === teamName.toLowerCase() ||
-    t.abbrev === teamName
+  const team = fbsTeams.find(
+    (t) =>
+      t.name === teamName ||
+      t.name.toLowerCase() === teamName.toLowerCase() ||
+      t.abbrev === teamName
   );
-  
+
   if (!team) {
     // Fallback for custom teams or unknown teams - try both formats
-    const sanitizedName = teamName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+    const sanitizedName = teamName
+      .replace(/\s+/g, "_")
+      .replace(/[^a-zA-Z0-9_]/g, "");
     // Return an array of possible paths to try
     return `/logos/${sanitizedName}_300x300.png`;
   }
-  
+
   // Create the logo filename using the naming convention
-  const schoolName = team.name.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_&]/g, '');
-  const teamNickname = team.nickName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_&]/g, '');
-  
+  const schoolName = team.name
+    .replace(/\s+/g, "_")
+    .replace(/[^a-zA-Z0-9_&]/g, "");
+  const teamNickname = team.nickName
+    .replace(/\s+/g, "_")
+    .replace(/[^a-zA-Z0-9_&]/g, "");
+
   // Return the primary format (without "logo")
   return `/logos/${schoolName}_${teamNickname}_300x300.png`;
 }
@@ -113,30 +132,40 @@ export function getTeamLogoPath(teamName: string): string {
  * Gets multiple possible logo paths to try in order of preference
  */
 export function getTeamLogoPaths(teamName: string): string[] {
-  const team = fbsTeams.find(t => 
-    t.name === teamName || 
-    t.name.toLowerCase() === teamName.toLowerCase() ||
-    t.abbrev === teamName
+  const team = fbsTeams.find(
+    (t) =>
+      t.name === teamName ||
+      t.name.toLowerCase() === teamName.toLowerCase() ||
+      t.abbrev === teamName
   );
-  
+
   if (!team) {
     // Fallback for custom teams or unknown teams
-    const sanitizedName = teamName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_&]/g, '');
+    const sanitizedName = teamName
+      .replace(/\s+/g, "_")
+      .replace(/[^a-zA-Z0-9_&]/g, "");
     return [
       `/logos/${sanitizedName}_300x300.png`,
       `/logos/${sanitizedName}_logo_300x300.png`,
-      `/logos/${teamName.replace(/\s+/g, '_')}-300x300.png`
+      `/logos/${teamName.replace(/\s+/g, "_")}-300x300.png`,
     ];
   }
-  
-  const schoolName = team.name.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_&]/g, '');
-  const teamNickname = team.nickName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_&]/g, '');
-  
+
+  const schoolName = team.name
+    .replace(/\s+/g, "_")
+    .replace(/[^a-zA-Z0-9_&]/g, "");
+  const teamNickname = team.nickName
+    .replace(/\s+/g, "_")
+    .replace(/[^a-zA-Z0-9_&]/g, "");
+
   // Return possible paths in order of preference
   return [
     `/logos/${schoolName}_${teamNickname}_300x300.png`,
     `/logos/${schoolName}_${teamNickname}_logo_300x300.png`,
-    `/logos/${team.name.replace(/\s+/g, '_')}_${team.nickName.replace(/\s+/g, '_')}_300x300.png`
+    `/logos/${team.name.replace(/\s+/g, "_")}_${team.nickName.replace(
+      /\s+/g,
+      "_"
+    )}_300x300.png`,
   ];
 }
 
@@ -144,7 +173,9 @@ export function getTeamLogoPaths(teamName: string): string[] {
  * Gets conference logo path
  */
 export function getConferenceLogoPath(conference: string): string {
-  const sanitizedConference = conference.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+  const sanitizedConference = conference
+    .replace(/\s+/g, "_")
+    .replace(/[^a-zA-Z0-9_]/g, "");
   return `/logos/conferences/${sanitizedConference}_logo_300x300.png`;
 }
 
@@ -152,26 +183,27 @@ export function getConferenceLogoPath(conference: string): string {
  * Gets team data including logo paths
  */
 export function getTeamWithLogo(teamName: string) {
-  const team = fbsTeams.find(t => 
-    t.name === teamName || 
-    t.name.toLowerCase() === teamName.toLowerCase() ||
-    t.abbrev === teamName
+  const team = fbsTeams.find(
+    (t) =>
+      t.name === teamName ||
+      t.name.toLowerCase() === teamName.toLowerCase() ||
+      t.abbrev === teamName
   );
-  
+
   if (!team) {
     return {
       name: teamName,
-      nickName: '',
-      conference: '',
+      nickName: "",
+      conference: "",
       logoPath: getTeamLogoPath(teamName),
-      conferenceLogo: ''
+      conferenceLogo: "",
     };
   }
-  
+
   return {
     ...team,
     logoPath: getTeamLogoPath(team.name),
-    conferenceLogo: getConferenceLogoPath(team.conference)
+    conferenceLogo: getConferenceLogoPath(team.conference),
   };
 }
 
@@ -190,6 +222,6 @@ export function getLogoCacheStats() {
   return {
     cachedLogos: logoCache.size,
     failedLogos: failedLogos.size,
-    totalAttempts: logoCache.size + failedLogos.size
+    totalAttempts: logoCache.size + failedLogos.size,
   };
 }
