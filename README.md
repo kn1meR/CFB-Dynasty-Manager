@@ -29,13 +29,15 @@
 
 2. Download the program [`HERE`](https://github.com/kn1meR/CFB-Dynasty-Manager/releases/download/CFB26/CFB-Dynasty-Manager-v2026.zip) and extract the folder to your desktop.
 
-3. Go to the `CFB-Dynasty-Manager-v2026` folder on your desktop, Right-Click on the folder, and select `Copy Path`.<br>
-   3a. Open Command Prompt, and type `cd` and paste the path you copied and press Enter. Now type `npm install`.
+3. Go to the `CFB-Dynasty-Manager-v2026` folder on your desktop.<br>
+   3a. Right-Click on the folder, and select `Copy Path`.<br>
+   3b. Open Command Prompt, and type `cd` and paste the path you copied and press Enter.<br>
+   3c. Type `npm install`.
 
 4. Once the installation is complete, type `npm run electron-dev` in the Command Prompt and the program will start.<br>
-      4a. If the app is not launching, make sure you are in the `CFB-Dynasty-Manager-v2026` folder.
+      4a. *Note: If the app is not launching, make sure you are in the `CFB-Dynasty-Manager-v2026` folder path in your Command Prompt.*
 
-5. When you're done using the app, you should close the app and end the process by pressing `ctrl+c` in the Command Prompt.
+5. When you're done using the app, make sure you save and close the app. End the process by pressing `ctrl+c` in the Command Prompt.
    
 6. Create a desktop shotcut to automate the process by creating a .bat file and enter `cd <folder_path> npm run electron-dev` and then save and use that as a psuedo-shortcut.
 
