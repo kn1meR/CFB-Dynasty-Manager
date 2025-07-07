@@ -38,8 +38,10 @@
     },
     "compression": "maximum",
     "mac": {
-      "icon": "public/favicon.ico",
+      "icon": "assets/icon.icns",
       "category": "public.app-category.sports",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
       "target": [
         {
           "target": "dmg",

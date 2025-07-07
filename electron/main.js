@@ -1,10 +1,25 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
-const path = require('path');
-const fs = require('fs');
+const { app, BrowserWindow, ipcMain } = require("electron");
+const path = require("path");
+const fs = require("fs");
 
 // Better development detection
-const isDev = process.env.NODE_ENV === 'development' || process.argv.includes('--dev') || !app.isPackaged;
+const isDev =
+  process.env.NODE_ENV === "development" ||
+  process.argv.includes("--dev") ||
+  !app.isPackaged;
 let mainWindow;
+
+// Determine platform-specific icon
+const getIconPath = () => {
+  switch (process.platform) {
+    case "darwin":
+      return path.join(__dirname, "../assets/icon.icns");
+    case "win32":
+      return path.join(__dirname, "../public/favicon.ico");
+    default:
+      return path.join(__dirname, "../public/favicon.ico");
+  }
+};
 
 function createWindow() {
   // Create the browser window
@@ -19,32 +34,33 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       enableRemoteModule: false,
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, "preload.js"),
       webSecurity: true, // Re-enable security for production
       allowRunningInsecureContent: false,
     },
-    icon: path.join(__dirname, '../public/favicon.ico'), // Use favicon as icon
+    icon: getIconPath(), // Use platform-specific icon
   });
 
   let startUrl;
 
   if (isDev) {
-    startUrl = 'http://localhost:3000';
-    console.log('Development mode detected - connecting to localhost:3000');
+    startUrl = "http://localhost:3000";
+    console.log("Development mode detected - connecting to localhost:3000");
   } else {
-    const indexPath = path.join(__dirname, '../out/index.html');
+    const indexPath = path.join(__dirname, "../out/index.html");
     startUrl = `file://${indexPath}`;
-    console.log('Production mode detected - loading from:', indexPath);
+    console.log("Production mode detected - loading from:", indexPath);
   }
-  
+
   // Load the application
-  mainWindow.loadURL(startUrl)
+  mainWindow
+    .loadURL(startUrl)
     .then(() => {
-      console.log('Application loaded successfully');
+      console.log("Application loaded successfully");
     })
-    .catch(err => {
-      console.error('Failed to load application:', err);
-      
+    .catch((err) => {
+      console.error("Failed to load application:", err);
+
       // In development, show a helpful error message
       if (isDev) {
         const devErrorHtml = `
@@ -100,16 +116,18 @@ function createWindow() {
             </body>
           </html>
         `;
-        
-        mainWindow.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(devErrorHtml));
+
+        mainWindow.loadURL(
+          "data:text/html;charset=utf-8," + encodeURIComponent(devErrorHtml)
+        );
       }
     });
 
   // Show window when ready
-  mainWindow.once('ready-to-show', () => {
+  mainWindow.once("ready-to-show", () => {
     mainWindow.show();
     mainWindow.focus();
-    
+
     // Open DevTools only in development
     if (isDev) {
       //mainWindow.webContents.openDevTools();
@@ -117,17 +135,24 @@ function createWindow() {
   });
 
   // Handle window closed
-  mainWindow.on('closed', () => {
+  mainWindow.on("closed", () => {
     mainWindow = null;
   });
 
   // Handle failed loads in production
-  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
-    console.error('Failed to load:', errorCode, errorDescription, validatedURL);
-    
-    // Show error page only in production
-    if (!isDev) {
-      const errorHtml = `
+  mainWindow.webContents.on(
+    "did-fail-load",
+    (event, errorCode, errorDescription, validatedURL) => {
+      console.error(
+        "Failed to load:",
+        errorCode,
+        errorDescription,
+        validatedURL
+      );
+
+      // Show error page only in production
+      if (!isDev) {
+        const errorHtml = `
         <html>
           <head>
             <title>Dynasty Manager - Error</title>
@@ -176,15 +201,18 @@ function createWindow() {
           </body>
         </html>
       `;
-      
-      mainWindow.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(errorHtml));
+
+        mainWindow.loadURL(
+          "data:text/html;charset=utf-8," + encodeURIComponent(errorHtml)
+        );
+      }
     }
-  });
+  );
 
   // Prevent external navigation
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    require('electron').shell.openExternal(url);
-    return { action: 'deny' };
+    require("electron").shell.openExternal(url);
+    return { action: "deny" };
   });
 }
 
@@ -193,38 +221,38 @@ app.whenReady().then(() => {
   createWindow();
 });
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
     app.quit();
   }
 });
 
-app.on('activate', () => {
+app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
 });
 
 // IPC handlers for localStorage fallback
-ipcMain.handle('electron-store-get', async (event, key) => {
+ipcMain.handle("electron-store-get", async (event, key) => {
   return undefined; // Fall back to localStorage
 });
 
-ipcMain.handle('electron-store-set', async (event, key, value) => {
+ipcMain.handle("electron-store-set", async (event, key, value) => {
   // Fall back to localStorage
 });
 
-ipcMain.handle('electron-store-delete', async (event, key) => {
+ipcMain.handle("electron-store-delete", async (event, key) => {
   // Fall back to localStorage
 });
 
-ipcMain.handle('electron-store-clear', async () => {
+ipcMain.handle("electron-store-clear", async () => {
   // Fall back to localStorage
 });
 
 // Security: Prevent new window creation
-app.on('web-contents-created', (event, contents) => {
-  contents.on('new-window', (event, navigationUrl) => {
+app.on("web-contents-created", (event, contents) => {
+  contents.on("new-window", (event, navigationUrl) => {
     event.preventDefault();
   });
 });
