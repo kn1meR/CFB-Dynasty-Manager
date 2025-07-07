@@ -29,9 +29,9 @@
 
 2. Download the program [`HERE`](https://github.com/kn1meR/CFB-Dynasty-Manager/releases/download/CFB26/CFB-Dynasty-Manager-v2026.zip) and extract the folder to your Desktop.
 
-3. Run the Setup.bat file.
+3. Run the `Setup.bat` file.
 
-4. Once the installation is complete, run the CFBDM.bat file.
+4. Once the installation is complete, run the `RunCFBDM.bat` file.
 
 5. When you're done using the app, make sure you save and close the app. End the process by pressing `ctrl+c` in the Command Prompt.
 
