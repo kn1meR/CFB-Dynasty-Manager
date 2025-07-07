@@ -24,21 +24,21 @@
 18. Manual Save - There is an autosave feature, but make sure to manually save before you close the app to be sure!
 
 <ins>**HOW TO USE:**</ins><br>
-*If you have used this before, run `npm ci`.  This will perform a clean install of the node_modules!*
 
-1. First you need to verify that you have [`node.js`](https://nodejs.org/en/download/package-manager/current) on your device. You can install it from the linked website, but if you want to check if you have it already, load up your device's terminal/console and type in `node -v`
+1. First, you need to download [`node.js`](https://nodejs.org/en/download/package-manager/current) on your PC. 
 
-2. Once that's done, you want to download/clone the repository. For that you can click on the green code button and click "Download as ZIP".  If using this way, then extract `CFB-Dynasty-Manager-main` from the .ZIP file and move to your Desktop.  Or you can use git and you can either use the command prompt `git clone <repo url>` or download Github Desktop which might be a bit easier if you are new to git and don't use it at all other than for this.  You can also download the release zip from the Release section!
+2. Download the program [`HERE`](https://github.com/kn1meR/CFB-Dynasty-Manager/releases/download/CFB26/CFB-Dynasty-Manager-v2026.zip) and extract the folder to your desktop.
 
-3. Once the repo is cloned, you need to use the Terminal again.  Go to the `CFB-Dynasty-Manager-main` folder on your desktop, Right-Click on the folder, and select `Copy Path`.  Then, open Command Prompt, and type `cd` and paste the path you copied, and then run `npm install`. This will install the dependencies.
+3. Go to the `CFB-Dynasty-Manager-v2026` folder on your desktop, Right-Click on the folder, and select `Copy Path`.<br>
+   3a. Open Command Prompt, and type `cd` and paste the path you copied and press Enter. Now type `npm install`.
 
-4. Once everything is installed, in the same folder path as before, run `npm run electron-dev` and the program will start.
+4. Once the installation is complete, type `npm run electron-dev` in the Command Prompt and the program will start.<br>
+      4a. If the app is not launching, make sure you are in the `CFB-Dynasty-Manager-v2026` folder.
 
-5. When you're done using the app, you should close the app and end the process by pressing `ctrl+c` in the Terminal.
+5. When you're done using the app, you should close the app and end the process by pressing `ctrl+c` in the Command Prompt.
    
-6. Whenever you want to run the app again, just naviate into the folder by typing `cd <folder_path>` in the Command Prompt, and type `npm run electron-dev`.
+6. Create a desktop shotcut to automate the process by creating a .bat file and enter `cd <folder_path> npm run electron-dev` and then save and use that as a psuedo-shortcut.
 
-   * *BONUS TIP - If you want to create a desktop shotcut to automate the process, you can make a .bat file and enter `cd <folder_path> npm run electron-dev` and then save and use that as a psuedo-shortcut.*
 
 
 <ins>**SCREENSHOTS:**</ins>
