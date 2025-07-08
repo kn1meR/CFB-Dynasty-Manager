@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { fbsTeams } from '@/utils/fbsTeams';
+import { fbsTeams, getTeamByName, getTeamData } from '@/utils/fbsTeams';
 import { toast } from 'react-hot-toast';
 import { Trophy, Plus, Calendar, User, School, Trash2, Play, Upload } from 'lucide-react';
 import { TeamLogo } from '@/components/ui/TeamLogo';
@@ -292,7 +292,37 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
   const formatDate = (dateString: string) => new Date(dateString).toLocaleString();
   // --- MODIFICATION END ---
   
-  const getSchoolInfo = (schoolName: string) => fbsTeams.find(team => team.name === schoolName) || null;
+  const getSchoolInfo = (dynasty: Dynasty): { name: string; conference: string } => {
+        // 1. Try to get data from the specific dynasty's saved object
+        const dynastyDataString = localStorage.getItem(`dynasty_${dynasty.id}`);
+        if (dynastyDataString) {
+            try {
+                const dynastyData = JSON.parse(dynastyDataString);
+                const profile = dynastyData.coachProfile;
+                if (profile && profile.schoolName) {
+                    // If a conference override exists in this dynasty's profile, use it
+                    if (profile.conference) {
+                        return { name: profile.schoolName, conference: profile.conference };
+                    }
+                    // Otherwise, get the default conference for that school
+                    const defaultTeamData = getTeamByName(profile.schoolName);
+                    return { 
+                        name: profile.schoolName, 
+                        conference: defaultTeamData?.conference || 'Custom Team'
+                    };
+                }
+            } catch (e) {
+                console.error(`Error parsing data for dynasty ${dynasty.id}`, e);
+            }
+        }
+    
+        // 2. Fallback to the default team data if the dynasty blob is missing or corrupt
+        const defaultTeamData = getTeamByName(dynasty.schoolName);
+        return { 
+            name: dynasty.schoolName, 
+            conference: defaultTeamData?.conference || 'Custom Team'
+        };
+    };
   
   const calculateDynastyRecord = (dynastyId: string) => {
     try {
@@ -369,21 +399,24 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
           <div>
             <h2 className="text-3xl font-bold text-white text-center mb-6">Your Dynasties</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {dynasties.map((dynasty) => {
-                const schoolInfo = getSchoolInfo(dynasty.schoolName);
-                const actualRecord = calculateDynastyRecord(dynasty.id);
-                return (
-                  <Card key={dynasty.id} className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/15 transition-all">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-white flex items-center gap-3">
-                        <TeamLogo teamName={dynasty.schoolName} size="lg" />
-                        <div className="flex-1">
-                          {dynasty.schoolName}
-                          <CardDescription className="text-blue-200 mt-1">
-                            Coach {dynasty.coachName} • {schoolInfo?.conference || 'Custom Team'}
-                          </CardDescription>
-                        </div>
-                      </CardTitle>
+                        {dynasties.map((dynasty) => {
+                            // --- THIS IS THE SECTION TO UPDATE ---
+                            const schoolInfo = getSchoolInfo(dynasty);
+                            const actualRecord = calculateDynastyRecord(dynasty.id);
+                            
+                            return (
+                                <Card key={dynasty.id} className="bg-white/10 ...">
+                                    <CardHeader className="pb-3">
+                                        <CardTitle className="text-white flex items-center gap-3">
+                                            <TeamLogo teamName={dynasty.schoolName} size="lg" />
+                                            <div className="flex-1">
+                                                {dynasty.schoolName}
+                                                <CardDescription className="text-blue-200 mt-1">
+                                                    {/* Use the dynamically retrieved conference */}
+                                                    Coach {dynasty.coachName} • {schoolInfo.conference}
+                                                </CardDescription>
+                                            </div>
+                                        </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3 pt-3">
                       <div className="flex items-center gap-2 text-blue-100"><Calendar className="h-4 w-4" /><span>Year: {dynasty.currentYear}</span></div>
