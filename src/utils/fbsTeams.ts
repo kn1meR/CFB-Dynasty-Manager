@@ -1,4 +1,8 @@
 // fbsTeams.ts
+
+import { getCoachProfile } from './localStorage';
+
+
 export interface Team {
   name: string,
   nickName: string,
@@ -1238,4 +1242,24 @@ export const fbsTeams: Team[] = [
 
 export function getTeamByName(name:string): Team|undefined {
   return fbsTeams.find(team => team.name === name);
+}
+
+export function getTeamData(teamName: string): Team | null {
+  const baseTeam = getTeamByName(teamName);
+  if (!baseTeam) {
+    return null; // Team not found in the base list
+  }
+
+  const coachProfile = getCoachProfile();
+
+  // Check if there's a conference override for the user's specific team
+  if (coachProfile && coachProfile.schoolName === teamName && coachProfile.conference) {
+    return {
+      ...baseTeam,
+      conference: coachProfile.conference as Team['conference'], // Apply the override
+    };
+  }
+
+  // If no override, return the base data
+  return baseTeam;
 }
