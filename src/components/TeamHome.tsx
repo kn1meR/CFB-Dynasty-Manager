@@ -28,6 +28,8 @@ import { usePlayerCard } from '@/hooks/usePlayerCard';
 import PlayerCard from './PlayerCard';
 import { useDynasty } from '@/contexts/DynastyContext';
 import { Top25History } from '@/hooks/useTop25Rankings';
+import { getTeamData } from '@/utils/fbsTeams';
+
 
 
 interface LocationRecord {
@@ -59,8 +61,8 @@ const TeamHome: React.FC = () => {
   const [currentWeek, setCurrentWeek] = useState(0);
 
   const teamData = useMemo(() => {
-    return teamName ? getTeamWithLogo(teamName) : null;
-  }, [teamName]);
+    return teamName ? getTeamData(teamName) : null;
+  }, [teamName, dataVersion]);
 
   useEffect(() => {
     const fetchData = () => {
@@ -268,7 +270,7 @@ const derivedStats = useMemo(() => {
           {teamData && <TeamLogo teamName={teamData.name} size="xl" />}
           <div>
             <h1 className="text-3xl font-bold">
-              {teamRank && <span className="text-blue-500">#{teamRank} </span>}
+              {teamRank && <span className="text-gray-600 dark:text-gray-400"><strong>#{teamRank}</strong> - </span>}
               {teamName} Dashboard • {currentYear}
             </h1>
             {teamData && teamData.conference && (<div className="flex items-center justify-center gap-2 mt-1"><ConferenceLogo conference={teamData.conference} size="sm" /><span className="text-lg text-gray-600 dark:text-gray-400">{teamData.conference}</span></div>)}
