@@ -1,10 +1,10 @@
 // src/types/playerTypes.ts
 
 // This file should contain types relating to a player's information (recruiting, roster, transfer, etc.)
-export const positions = ['QB', 'RB', 'FB', 'WR', 'TE', 'LT', 'LG', 'C', 'RG', 'RT', 'LE', 'RE', 'DT', 'LOLB', 'MLB', 'ROLB', 'CB', 'FS', 'SS', 'K', 'P'];
+export const positions = ['QB', 'RB', 'FB', 'WR', 'TE', 'LT', 'LG', 'C', 'RG', 'RT', 'LEDGE', 'REDGE', 'DT', 'SAM', 'MIKE', 'WILL', 'CB', 'FS', 'SS', 'K', 'P'];
 export const generalPositions = ['QB', 'RB', 'WR', 'TE', 'OL', 'DL', 'LB', 'CB', 'S', 'K', 'P', 'ATH'];
 export const offensePositions = ['QB', 'RB', 'FB', 'WR', 'TE', 'LT', 'LG', 'C', 'RG', 'RT'];
-export const defensivePositions = ['LE', 'RE', 'DT', 'LOLB', 'MLB', 'ROLB', 'CB', 'FS', 'SS'];
+export const defensivePositions = ['LEDGE', 'REDGE', 'DT', 'SAM', 'MIKE', 'WILL', 'CB', 'FS', 'SS'];
 export const specialTeamsPositions = ['K', 'P']
 
 export interface Player {
