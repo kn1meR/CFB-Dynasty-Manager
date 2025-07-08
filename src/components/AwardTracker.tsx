@@ -13,6 +13,9 @@ import { Player } from '@/types/playerTypes';
 import { Award } from '@/types/statTypes';
 import { toast } from 'react-hot-toast';
 import { getCoachProfile, getYearRecord, setYearRecord } from '@/utils/localStorage';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle, AlertDialogTrigger } from './ui/alert-dialog';
+import { AlertDialogFooter, AlertDialogHeader } from './ui/alert-dialog';
+import { Pencil, Trash2 } from 'lucide-react';
 
 const predefinedAwards = [
   "All-American",
@@ -241,9 +244,15 @@ const AwardTracker: React.FC = () => {
                     {award.team && <span className="ml-2 font-semibold text-gray-600 dark:text-gray-400">({award.team})</span>}
                   </TableCell>
                   <TableCell className="text-center">
-                    <div className="flex justify-center space-x-2">
-                      <Button onClick={() => startEditing(award)} size="sm">Edit</Button>
-                      <Button onClick={() => removeAward(award.id)} variant="destructive" size="sm">Remove</Button>
+                    <div className="flex items-center gap-1 justify-center">
+                      <Button variant="ghost" size="icon" onClick={() => startEditing(award)} title="Edit"> <Pencil className="h-4 w-4" /></Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild><Button variant="ghost" size="icon" title="Remove Player"><Trash2 className="h-4 w-4 text-red-500" /></Button></AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader><AlertDialogTitle>Remove Player</AlertDialogTitle><AlertDialogDescription>Are you sure you want to remove {award.awardName} from this player?</AlertDialogDescription></AlertDialogHeader>
+                          <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => removeAward(award.id)}>Remove</AlertDialogAction></AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </TableCell>
                 </TableRow>
