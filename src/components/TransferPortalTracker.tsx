@@ -16,6 +16,8 @@ import { generalPositions } from '@/types/playerTypes';
 import { notifySuccess, notifyError, MESSAGES } from '@/utils/notification-utils';
 // --- MODIFICATION START: Import TeamLogo ---
 import { TeamLogo } from './ui/TeamLogo';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './ui/alert-dialog';
+import { Pencil, Trash2 } from 'lucide-react';
 // --- MODIFICATION END ---
 
 const starOptions = ['5', '4', '3', '2', '1'];
@@ -244,9 +246,15 @@ const TransferPortalTracker: React.FC = () => {
                   </td>
                   {/* --- MODIFICATION END --- */}
                   <td className="text-center">
-                    <div className="flex justify-center space-x-2">
-                      <Button onClick={() => startEditing(transfer)} size="sm">Edit</Button>
-                      <Button onClick={() => removeTransfer(transfer.id)} variant="destructive" size="sm">Remove</Button>
+                    <div className="flex items-center gap-1 justify-center">
+                      <Button variant="ghost" size="icon" onClick={() => startEditing(transfer)} title="Edit"> <Pencil className="h-4 w-4" /></Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild><Button variant="ghost" size="icon" title="Remove Player"><Trash2 className="h-4 w-4 text-red-500" /></Button></AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader><AlertDialogTitle>Remove Player</AlertDialogTitle><AlertDialogDescription>Are you sure you want to remove {transfer.playerName}?</AlertDialogDescription></AlertDialogHeader>
+                          <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => removeTransfer(transfer.id)}>Remove</AlertDialogAction></AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </td>
                 </tr>
