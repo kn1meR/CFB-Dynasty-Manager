@@ -10,7 +10,7 @@ import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
 import { TeamLogo, ConferenceLogo } from '@/components/ui/TeamLogo';
 import { getTeamWithLogo } from '@/utils/logoUtils';
 import { getCurrentYear, getSchedule, setSchedule, setYearStats, calculateStats, getYearStats, getCoachProfile, getTeamRankForWeek } from '@/utils/localStorage';
-import { fbsTeams } from '@/utils/fbsTeams';
+import { fbsTeams, getTeamData } from '@/utils/fbsTeams';
 import { fcsTeams } from '@/utils/fcsTeams';
 import { notifySuccess, notifyError, MESSAGES } from '@/utils/notification-utils';
 import { AlertCircle, Trophy, TrendingUp, TrendingDown, Minus, Calendar } from 'lucide-react';
@@ -253,8 +253,8 @@ const SchedulePage = () => {
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const teamData = useMemo(() => {
-    return teamName !== 'Your Team' ? getTeamWithLogo(teamName) : null;
-  }, [teamName]);
+    return teamName ? getTeamData(teamName) : null;
+  }, [teamName, dataVersion]);
 
   const record = useMemo(() => {
     const wins = currentSchedule.filter(game => game.result === 'Win').length;
