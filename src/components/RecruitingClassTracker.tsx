@@ -12,6 +12,8 @@ import { capitalizeName } from '@/utils';
 import { Recruit } from '@/types/playerTypes';
 import { generalPositions } from '@/types/playerTypes';
 import { notifySuccess, notifyError, MESSAGES } from '@/utils/notification-utils';
+import { Pencil, Trash2 } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './ui/alert-dialog';
 
 interface DevTraitBadgeProps {
   trait: 'Normal' | 'Impact' | 'Star' | 'Elite';
@@ -26,12 +28,12 @@ const sortRecruitsByStars = (recruits: Recruit[]): Recruit[] => {
     // Convert star strings to numbers for comparison
     const starsA = parseInt(a.stars) || 0;
     const starsB = parseInt(b.stars) || 0;
-    
+
     // Sort by stars descending (5 to 1)
     if (starsA !== starsB) {
       return starsB - starsA;
     }
-    
+
     // If stars are equal, sort by rating descending as secondary sort
     const ratingA = parseInt(a.rating) || 0;
     const ratingB = parseInt(b.rating) || 0;
@@ -213,9 +215,15 @@ const RecruitingClassTracker: React.FC = () => {
                   <td className="text-center">{recruit.rating}</td>
                   <td className="text-center"><DevTraitBadge trait={recruit.potential as 'Elite' | 'Star' | 'Impact' | 'Normal'} /></td>
                   <td className="text-center">
-                    <div className="flex justify-center space-x-2">
-                      <Button onClick={() => startEditing(recruit)} size="sm">Edit</Button>
-                      <Button onClick={() => removeRecruit(recruit.id)} variant="destructive" size="sm">Remove</Button>
+                    <div className="flex items-center gap-1 justify-center">
+                      <Button variant="ghost" size="icon" onClick={() => startEditing(recruit)} title="Edit"> <Pencil className="h-4 w-4" /></Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild><Button variant="ghost" size="icon" title="Remove Player"><Trash2 className="h-4 w-4 text-red-500" /></Button></AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader><AlertDialogTitle>Remove Player</AlertDialogTitle><AlertDialogDescription>Are you sure you want to remove {recruit.name}?</AlertDialogDescription></AlertDialogHeader>
+                          <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => removeRecruit(recruit.id)}>Remove</AlertDialogAction></AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </td>
                 </tr>
