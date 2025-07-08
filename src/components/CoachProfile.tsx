@@ -1,7 +1,7 @@
 // Enhanced src/components/CoachProfile.tsx
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Papa from 'papaparse';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { User, School, Calendar, Palette } from 'lucide-react';
-import { fbsTeams } from '@/utils/fbsTeams';
+import { getTeamByName, getTeamData, fbsTeams } from '@/utils/fbsTeams';
 import { notifySuccess, notifyError, MESSAGES } from '@/utils/notification-utils';
 import { useDynasty } from '@/contexts/DynastyContext';
 import { getCoachProfile, setCoachProfile, getCurrentYear, setCurrentYear } from '@/utils/localStorage';
@@ -29,6 +29,9 @@ const CoachProfile = () => {
   const [displayYear, setDisplayYear] = useState<number>(defaultYear);
   const [isEditing, setIsEditing] = useState(false);
   const [schoolColorPresets, setSchoolColorPresets] = useState<Record<string, { primary: string; secondary: string; accent: string }>>({});
+  const conferences = useMemo(() => 
+    [...new Set(fbsTeams.map(t => t.conference))].sort(), 
+  []);
 
   useEffect(() => {
     const loadSchoolColors = async () => {
@@ -161,9 +164,28 @@ const CoachProfile = () => {
               </Select>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="conference" className="text-right">Conference</Label>
+              <Select
+                // Use the profile's conference, or fall back to the default for the selected school
+                value={profile.conference || getTeamByName(profile.schoolName)?.conference || ''}
+                onValueChange={(value) => setProfile(p => ({ ...p, conference: value }))}
+                disabled={!profile.schoolName}
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Select conference" />
+                </SelectTrigger>
+                <SelectContent>
+                  {conferences.map(conf => (
+                    <SelectItem key={conf} value={conf}>{conf}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="currentYear" className="text-right">Current Year</Label>
               <Input id="currentYear" type="number" value={displayYear} onChange={e => setDisplayYear(parseInt(e.target.value) || defaultYear)} className="col-span-3"/>
             </div>
+            
             <div className="border-t pt-4">
               <Label className="text-lg font-semibold mb-4 flex items-center gap-2"><Palette className="h-4 w-4" />School Colors</Label>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
