@@ -5,7 +5,7 @@ import { Recruit, Transfer, Player, DraftedPlayer } from "@/types/playerTypes";
 import { Award } from "@/types/statTypes";
 import { Game, YearRecord, YearStats } from "@/types/yearRecord";
 import { CoachProfile } from '@/types/coachProfile';
-import { getTeamByName, Team } from "./fbsTeams";
+import { getTeamByName, Team, getTeamData } from "./fbsTeams";
 import { PlayerStat } from "@/types/playerStats";
 import { CustomTeamManager } from './customTeamManager';
 import { RankedTeam, Top25History } from '@/hooks/useTop25Rankings';
@@ -167,14 +167,18 @@ const defaultYearStats: YearStats = {
 export const calculateStats = (schedule: Game[], schoolName: string): YearStats => {
   let wins = 0, losses = 0, pointsScored = 0, pointsAgainst = 0, conferenceWins = 0, conferenceLosses = 0;
   
-  const currentSchool = CustomTeamManager.getEffectiveTeam(schoolName);
+  // --- USE THE NEW getTeamData FUNCTION ---
+  const currentSchool = getTeamData(schoolName);
 
   schedule.forEach(game => {
     if (!game.opponent || game.opponent === 'BYE' || game.opponent === 'NONE' || game.result === 'N/A' || game.result === 'Bye') {
       return;
     }
     
-    const opponentSchool = CustomTeamManager.getEffectiveTeam(game.opponent);
+    // --- USE THE NEW getTeamData FUNCTION HERE TOO ---
+    const opponentSchool = getTeamData(game.opponent);
+    
+    // The rest of the logic remains the same but now uses the correct conference data
     const isConferenceGame = !!(currentSchool && opponentSchool && 
                                currentSchool.conference === opponentSchool.conference);
 
@@ -203,6 +207,7 @@ export const calculateStats = (schedule: Game[], schoolName: string): YearStats 
     conferenceStanding: '', bowlGame: '', bowlResult: ''
   };
 };
+
 
 export const getYearStats = (year: number): YearStats => {
   const storedStats = safeLocalStorage.getItem(getYearStatsKey(year));
