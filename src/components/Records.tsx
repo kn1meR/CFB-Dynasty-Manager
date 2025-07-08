@@ -17,13 +17,13 @@ import { DraftedPlayer } from "@/types/playerTypes";
 import { Trophy, Medal, Star, TrendingUp, Users, Award, X, Save, Calendar, UserPlus, ShieldCheck, BarChart2, Zap, ChevronsUp, ChevronsDown } from "lucide-react";
 import { TeamLogo, ConferenceLogo } from "@/components/ui/TeamLogo";
 import { getTeamWithLogo } from "@/utils/logoUtils";
-import { fbsTeams } from '@/utils/fbsTeams';
+import { fbsTeams, getTeamData } from '@/utils/fbsTeams';
 import { toast } from 'react-hot-toast';
 import { MESSAGES } from '@/utils/notification-utils';
 import { Badge } from '@/components/ui/badge';
 import { useDynasty } from '@/contexts/DynastyContext';
 
-const classOptions = ["FR", "SO", "JR", "SR", "Grad Student"];
+const classOptions = ["FR", "FR (RS)", "SO", "SO (RS)", "JR", "JR (RS)", "SR", "SR (RS)",];
 const positionOptions = ["QB", "RB", "WR", "TE", "K", "P", "OL", "DL", "LB", "CB", "S"];
 const SCHEDULE_SIZE = 21;
 
@@ -145,6 +145,24 @@ const Records: React.FC = () => {
     setHasChanges(false);
 
   }, [selectedYear, currentYear, dataVersion]);
+
+  const getConferenceForYear = (year: number): string => {
+        const coachProfile = getCoachProfile();
+        // For the currently active dynasty year, check the profile for an override.
+        if (year === currentYear && coachProfile?.conference) {
+            return coachProfile.conference;
+        }
+
+        // For past years, we assume the conference was what's in the default data.
+        // A more advanced (and complex) solution would be to save the conference in each YearRecord,
+        // but for now, this keeps it simple and consistent.
+        if (coachProfile?.schoolName) {
+            const teamData = getTeamData(coachProfile.schoolName);
+            return teamData?.conference || 'N/A';
+        }
+
+        return 'N/A';
+    };
 
     const handleFieldChange = (field: keyof YearRecord, value: any) => {
         setActiveRecord(prev => prev ? { ...prev, [field]: value } : null);
@@ -275,7 +293,15 @@ const Records: React.FC = () => {
                                     <div>
                                         <h2 className="text-3xl font-bold">{activeRecord.year} Season Summary</h2>
                                         <div className="flex items-center justify-center gap-2 mt-1">
-                                            {(() => { const p = getCoachProfile(); const t = p?.schoolName ? getTeamWithLogo(p.schoolName) : null; return t ? <><ConferenceLogo conference={t.conference} size="sm" /><span className="text-md text-gray-600 dark:text-gray-400">{t.conference}</span></> : null; })()}
+                                            {(() => {
+                                                const conference = getConferenceForYear(activeRecord.year);
+                                                return conference !== 'N/A' ? (
+                                                    <>
+                                                        <ConferenceLogo conference={conference} size="sm" />
+                                                        <span className="text-md text-gray-600 dark:text-gray-400">{conference}</span>
+                                                    </>
+                                                ) : null;
+                                            })()}
                                         </div>
                                     </div>
                                 </div>
