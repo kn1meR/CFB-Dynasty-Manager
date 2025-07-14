@@ -14,8 +14,9 @@ import { toast } from 'react-hot-toast';
 import { Trophy, Plus, Calendar, User, School, Trash2, Play, Upload } from 'lucide-react';
 import { TeamLogo } from '@/components/ui/TeamLogo';
 import Papa from 'papaparse';
-import { clearActiveSessionData, restoreDynastyFromSnapshot } from '@/utils/localStorage';
+import { clearActiveSessionData, getTop25History, restoreDynastyFromSnapshot } from '@/utils/localStorage';
 import { DynastySnapshot } from '@/utils/dynasty-export';
+import { RankedTeam } from '@/hooks/useTop25Rankings';
 
 interface Dynasty {
   id: string;
@@ -133,6 +134,31 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
     // A more advanced calculation could be done, but for now, we reset it.
     return { wins: 0, losses: 0, seasonsPlayed: 0 };
   };
+
+  const getLatestRank = (dynastyId: string, teamName: string): number | null => {
+    try {
+        const dynastyDataString = localStorage.getItem(`dynasty_${dynastyId}`);
+        if (!dynastyDataString) return null;
+        
+        const snapshot = JSON.parse(dynastyDataString);
+        const history = snapshot.top25History || {};
+        if (!history || Object.keys(history).length === 0) return null;
+
+        const latestYear = Math.max(...Object.keys(history).map(Number).filter(isFinite));
+        const yearData = history[latestYear];
+        if (!yearData) return null;
+
+        const latestWeek = Math.max(...Object.keys(yearData).map(Number).filter(isFinite));
+        const latestPoll = yearData[latestWeek];
+        if (!latestPoll) return null;
+        
+        const rankIndex = latestPoll.findIndex((t: any) => t.name === teamName);
+        return rankIndex !== -1 ? rankIndex + 1 : null;
+    } catch {
+        return null;
+    }
+  };
+
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -403,6 +429,7 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
                             // --- THIS IS THE SECTION TO UPDATE ---
                             const schoolInfo = getSchoolInfo(dynasty);
                             const actualRecord = calculateDynastyRecord(dynasty.id);
+                            const teamRank = getLatestRank(dynasty.id, dynasty.schoolName);
                             
                             return (
                                 <Card key={dynasty.id} className="bg-white/10 ...">
@@ -410,6 +437,9 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
                                         <CardTitle className="text-white flex items-center gap-3">
                                             <TeamLogo teamName={dynasty.schoolName} size="lg" />
                                             <div className="flex-1">
+                                              <span className="truncate font-bold text-lg">
+                                                {teamRank && <span className="text-white font-bold text-xl">#{teamRank} </span>}
+                                              </span>
                                                 {dynasty.schoolName}
                                                 <CardDescription className="text-blue-200 mt-1">
                                                     {/* Use the dynamically retrieved conference */}
