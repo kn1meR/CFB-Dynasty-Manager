@@ -8,6 +8,7 @@ import CoachProfile from './CoachProfile';
 import { ThemeToggle } from './ThemeToggle';
 import { Button } from './ui/button';
 import { Home, Save } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './ui/alert-dialog';
 
 interface NavigationProps {
   onReturnToLaunch?: () => void;
@@ -16,6 +17,18 @@ interface NavigationProps {
 
 const Navigation: React.FC<NavigationProps> = memo(({ onReturnToLaunch, onManualSave }) => {
   const pathname = usePathname();
+
+  const handleSaveAndExit = () => {
+    // 1. Call the existing manual save function
+    if (onManualSave) {
+      onManualSave(); 
+    }
+
+    // 2. Execute the navigation function
+    if (onReturnToLaunch) {
+      onReturnToLaunch();
+    }
+  };
 
   const navItems = [
     { name: 'Team Home', path: '/' },
@@ -39,16 +52,34 @@ const Navigation: React.FC<NavigationProps> = memo(({ onReturnToLaunch, onManual
           {/* Left Side - Home Button */}
           <div className="flex items-center">
             {onReturnToLaunch && (
-              <Button
-                onClick={onReturnToLaunch}
-                variant="ghost"
-                size="sm"
-                className="text-gray-900 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 px-3 py-2"
-                title="Return to Dynasty Selection"
-              >
-                <Home className="h-5 w-5" />
-              </Button>
-            )}
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-900 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 px-3 py-2"
+                  title="Return to Dynasty Selection"
+                >
+                  <Home className="h-5 w-5" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Return to Main Menu?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Would you like to save your current progress before returning to the dynasty selection screen? 
+                    Any unsaved changes will be lost.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleSaveAndExit}>
+                    Save & Exit
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
           </div>
           
           {/* Center - Navigation Items */}
@@ -100,60 +131,6 @@ const Navigation: React.FC<NavigationProps> = memo(({ onReturnToLaunch, onManual
             
             <ThemeToggle />
           </div>
-        </div>
-      </div>
-      
-      {/* Mobile menu */}
-      <div className="sm:hidden">
-        <div className="pt-2 pb-3 space-y-1">
-          {onReturnToLaunch && (
-            <div className="px-3 pb-2">
-              <Button
-                onClick={onReturnToLaunch}
-                variant="ghost"
-                size="sm"
-                className="w-full text-left text-gray-200 hover:bg-gray-700 justify-start"
-              >
-                <Home className="h-4 w-4 mr-2" />
-                Dynasty Selection
-              </Button>
-            </div>
-          )}
-          
-          {navItems.map((item) => {
-            // Apply the same fix for the mobile menu
-            const isActive = pathname ? 
-              (item.path === '/' ? pathname === '/' : pathname.startsWith(item.path))
-              : false;
-
-            return (
-              <Link
-                key={item.name}
-                href={item.path}
-                className={`${
-                  isActive
-                    ? 'bg-blue-500 border-blue-500 text-white'
-                    : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white'
-                } block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}
-              >
-                {item.name}
-              </Link>
-            );
-          })}
-          
-          {onManualSave && (
-            <div className="pt-2 border-t border-gray-700 px-3">
-              <Button
-                onClick={onManualSave}
-                variant="ghost"
-                size="sm"
-                className="w-full text-left text-gray-200 hover:bg-gray-700 justify-start"
-              >
-                <Save className="h-4 w-4 mr-2" />
-                Save Dynasty
-              </Button>
-            </div>
-          )}
         </div>
       </div>
     </nav>
