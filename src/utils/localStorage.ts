@@ -453,6 +453,9 @@ export const getTeamRankForWeek = (teamName: string, year: number, week: number)
 
 export const prepareNextSeason = (year: number): void => {
   try {
+    // THIS IS THE FIX: Update the global current year
+    setCurrentYear(year);
+
     // 1. Create a fresh schedule for the new year
     const newSchedule: Game[] = Array.from({ length: 21 }, (_, i) => ({
       id: i,
