@@ -187,79 +187,193 @@ const Roster: React.FC = () => {
   return (
     <div className="space-y-8">
       <h1 className="text-3xl font-bold text-center">Roster Management</h1>
-      
+
       <Card className="shadow-lg">
         <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <CardTitle className="text-xl font-semibold">Team Roster</CardTitle>
-              <div className="flex flex-wrap items-center gap-2">
-                  <Button onClick={handleOpenAddForm} className="btn-school-primary"><Plus className="h-4 w-4 mr-2" />Add New Player</Button>
-                  <RosterImageUpload onProcessComplete={handleProcessComplete} />
-                  <RosterCSVImport onImportComplete={handleImportComplete} />
-                  <Button onClick={exportToCSV} variant="outline"><Download className="h-4 w-4 mr-2" />Export CSV</Button>
-              </div>
+            <CardTitle className="text-xl font-semibold">Team Roster</CardTitle>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                onClick={handleOpenAddForm}
+                className="btn-school-primary"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add New Player
+              </Button>
+              <RosterImageUpload onProcessComplete={handleProcessComplete} />
+              <RosterCSVImport onImportComplete={handleImportComplete} />
+              <Button onClick={exportToCSV} variant="outline">
+                <Download className="h-4 w-4 mr-2" />
+                Export CSV
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
-          <div className='w-full sm:w-1/2 md:w-1/3 lg:w-1/4 pb-4'>
-            <Select value={posFilter} onValueChange={(value) => setPosFilter(value)}>
-              <SelectTrigger><SelectValue placeholder='Filter by Position' /></SelectTrigger>
+          <div className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 pb-4">
+            <Select
+              value={posFilter}
+              onValueChange={(value) => setPosFilter(value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Filter by Position" />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value={FILTER_ALL}>All Positions</SelectItem>
                 <SelectItem value={FILTER_OFFENSE}>Offense</SelectItem>
                 <SelectItem value={FILTER_DEFENSE}>Defense</SelectItem>
-                <SelectItem value={FILTER_SPECIAL_TEAMS}>Special Teams</SelectItem>
-                {positions.map((pos) => (<SelectItem key={pos} value={pos}>{pos}</SelectItem>))}
+                <SelectItem value={FILTER_SPECIAL_TEAMS}>
+                  Special Teams
+                </SelectItem>
+                {positions.map((pos) => (
+                  <SelectItem key={pos} value={pos}>
+                    {pos}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
           {sortedPlayers.length > 0 ? (
             <div className="overflow-x-auto">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            {['Jersey #', 'Name', 'Position', 'Year', 'Rating', 'Dev. Trait', 'Notes', 'Actions'].map(header => (
-                                <TableHead key={header} className="text-center cursor-pointer" onClick={() => header !== 'Actions' && requestSort(header.toLowerCase() as SortField)}>
-                                    <div className="flex items-center justify-center gap-1">
-                                        {header}
-                                        {header !== 'Actions' && sortConfig.field === header.toLowerCase() && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
-                                    </div>
-                                </TableHead>
-                            ))}
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {sortedPlayers.map(player => (
-                        <TableRow key={player.id} className={getRowClassName(player)}>
-                            <TableCell className="text-center font-mono">{player.jerseyNumber}</TableCell>
-                            <TableCell className="text-center font-medium">
-                                <button onClick={() => openPlayerCard(player)} className="hover:underline">{player.name}</button>
-                            </TableCell>
-                            <TableCell className="text-center">{player.position}</TableCell>
-                            <TableCell className="text-center">{player.year}</TableCell>
-                            <TableCell className="text-center font-bold">{player.rating}</TableCell>
-                            <TableCell className="text-center"><DevTraitBadge trait={player.devTrait} /></TableCell>
-                            <TableCell className="text-center text-sm text-muted-foreground max-w-xs truncate" title={player.notes}>{player.notes}</TableCell>
-                            <TableCell className="text-center">
-                                <div className="flex items-center gap-1 justify-center">
-                                    <Button variant="ghost" size="icon" onClick={() => toggleRedshirtStatus(player.id)} title={player.isRedshirted ? "Remove Redshirt" : "Add Redshirt"}><Shirt className={`h-4 w-4 ${player.isRedshirted ? 'text-red-600' : 'text-muted-foreground'}`} /></Button>
-                                    <Button variant="ghost" size="icon" onClick={() => startEditing(player)} title="Edit Player"><Pencil className="h-4 w-4" /></Button>
-                                    <AlertDialog>
-                                        <AlertDialogTrigger asChild><Button variant="ghost" size="icon" title="Remove Player"><Trash2 className="h-4 w-4 text-red-500" /></Button></AlertDialogTrigger>
-                                        <AlertDialogContent>
-                                            <AlertDialogHeader><AlertDialogTitle>Remove Player</AlertDialogTitle><AlertDialogDescription>Are you sure you want to remove {player.name}?</AlertDialogDescription></AlertDialogHeader>
-                                            <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => removePlayer(player.id)}>Remove</AlertDialogAction></AlertDialogFooter>
-                                        </AlertDialogContent>
-                                    </AlertDialog>
-                                </div>
-                            </TableCell>
-                        </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    {[
+                      "Jersey #",
+                      "Name",
+                      "Position",
+                      "Year",
+                      "Rating",
+                      "Dev. Trait",
+                      "Notes",
+                      "Actions",
+                    ].map((header) => (
+                      <TableHead
+                        key={header}
+                        className="text-center cursor-pointer"
+                        onClick={() =>
+                          header !== "Actions" &&
+                          requestSort(header.toLowerCase() as SortField)
+                        }
+                      >
+                        <div className="flex items-center justify-center gap-1">
+                          {header}
+                          {header !== "Actions" &&
+                            sortConfig.field === header.toLowerCase() &&
+                            (sortConfig.direction === "asc" ? " ▲" : " ▼")}
+                        </div>
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {sortedPlayers.map((player) => (
+                    <TableRow
+                      key={player.id}
+                      className={getRowClassName(player)}
+                    >
+                      <TableCell className="text-center font-mono">
+                        {player.jerseyNumber}
+                      </TableCell>
+                      <TableCell className="text-center font-medium">
+                        <button
+                          onClick={() => openPlayerCard(player)}
+                          className="hover:underline"
+                        >
+                          {player.name}
+                        </button>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {player.position}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {player.year}
+                      </TableCell>
+                      <TableCell className="text-center font-bold">
+                        {player.rating}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <DevTraitBadge trait={player.devTrait} />
+                      </TableCell>
+                      <TableCell
+                        className="text-center text-sm text-muted-foreground max-w-xs truncate"
+                        title={player.notes}
+                      >
+                        {player.notes}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <div className="flex items-center gap-1 justify-center">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => toggleRedshirtStatus(player.id)}
+                            title={
+                              player.year.includes("(RS)")
+                                ? "Player has already used a redshirt"
+                                : player.isRedshirted
+                                ? "Remove Redshirt"
+                                : "Add Redshirt"
+                            }
+                            // --- THIS IS THE FIX ---
+                            // Disable the button if the player's year indicates they've already been redshirted.
+                            disabled={player.year.includes("(RS)")}
+                          >
+                            <Shirt
+                              className={`h-4 w-4 ${
+                                player.isRedshirted
+                                  ? "text-red-600"
+                                  : "text-muted-foreground"
+                              }`}
+                            />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => startEditing(player)}
+                            title="Edit Player"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                title="Remove Player"
+                              >
+                                <Trash2 className="h-4 w-4 text-red-500" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  Remove Player
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to remove {player.name}?
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => removePlayer(player.id)}
+                                >
+                                  Remove
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
           ) : (
-            <p className="text-center text-muted-foreground py-8">No players found. Add a player or adjust filters.</p>
+            <p className="text-center text-muted-foreground py-8">
+              No players found. Add a player or adjust filters.
+            </p>
           )}
         </CardContent>
       </Card>
@@ -267,28 +381,162 @@ const Roster: React.FC = () => {
       {/* Add/Edit Player Dialog */}
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="sm:max-w-[800px]">
-            <DialogHeader>
-                <DialogTitle>{editingId ? 'Edit Player' : 'Add New Player'}</DialogTitle>
-                <CardDescription>Fill in the details for the player.</CardDescription>
-            </DialogHeader>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 py-4">
-                <div className="space-y-1.5"><Label htmlFor="jerseyNumber">Jersey #</Label><Input id="jerseyNumber" value={newPlayer.jerseyNumber} onChange={e => setNewPlayer(p => ({ ...p, jerseyNumber: e.target.value.replace(/\D/g, '').slice(0, 2) }))} placeholder="#" className={errors.jerseyNumber ? 'border-red-500' : ''}/>{errors.jerseyNumber && <p className="text-red-500 text-xs">{errors.jerseyNumber}</p>}</div>
-                <div className="space-y-1.5"><Label htmlFor="name">Name</Label><Input id="name" value={newPlayer.name} onChange={e => setNewPlayer(p => ({ ...p, name: e.target.value }))} placeholder="John Doe" className={errors.name ? 'border-red-500' : ''}/>{errors.name && <p className="text-red-500 text-xs">{errors.name}</p>}</div>
-                <div className="space-y-1.5"><Label htmlFor="position">Position</Label><Select value={newPlayer.position} onValueChange={v => setNewPlayer(p => ({ ...p, position: v }))}><SelectTrigger id="position" className={errors.position ? 'border-red-500' : ''}><SelectValue placeholder="Position" /></SelectTrigger><SelectContent>{positions.map(pos => (<SelectItem key={pos} value={pos}>{pos}</SelectItem>))}</SelectContent></Select>{errors.position && <p className="text-red-500 text-xs">{errors.position}</p>}</div>
-                <div className="space-y-1.5"><Label htmlFor="year">Year</Label><Select value={newPlayer.year} onValueChange={v => setNewPlayer(p => ({ ...p, year: v }))}><SelectTrigger id="year"><SelectValue placeholder="Year" /></SelectTrigger><SelectContent>{years.map(y => (<SelectItem key={y} value={y}>{y}</SelectItem>))}</SelectContent></Select></div>
-                <div className="space-y-1.5"><Label htmlFor="rating">Rating</Label><Input id="rating" value={newPlayer.rating} onChange={e => setNewPlayer(p => ({ ...p, rating: e.target.value.replace(/\D/g, '').slice(0, 2) }))} placeholder="OVR" className={errors.rating ? 'border-red-500' : ''}/>{errors.rating && <p className="text-red-500 text-xs">{errors.rating}</p>}</div>
-                <div className="space-y-1.5"><Label htmlFor="devTrait">Dev. Trait</Label><Select value={newPlayer.devTrait} onValueChange={v => setNewPlayer(p => ({ ...p, devTrait: v as Player['devTrait'] }))}><SelectTrigger id="devTrait"><SelectValue placeholder="Trait" /></SelectTrigger><SelectContent>{devTraits.map(t => (<SelectItem key={t} value={t}>{t}</SelectItem>))}</SelectContent></Select></div>
-                <div className="space-y-1.5 col-span-1 md:col-span-2"><Label htmlFor="notes">Notes</Label><Input id="notes" value={newPlayer.notes} onChange={e => setNewPlayer(p => ({ ...p, notes: e.target.value }))} placeholder="Optional notes..."/></div>
+          <DialogHeader>
+            <DialogTitle>
+              {editingId ? "Edit Player" : "Add New Player"}
+            </DialogTitle>
+            <CardDescription>
+              Fill in the details for the player.
+            </CardDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 py-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="jerseyNumber">Jersey #</Label>
+              <Input
+                id="jerseyNumber"
+                value={newPlayer.jerseyNumber}
+                onChange={(e) =>
+                  setNewPlayer((p) => ({
+                    ...p,
+                    jerseyNumber: e.target.value.replace(/\D/g, "").slice(0, 2),
+                  }))
+                }
+                placeholder="#"
+                className={errors.jerseyNumber ? "border-red-500" : ""}
+              />
+              {errors.jerseyNumber && (
+                <p className="text-red-500 text-xs">{errors.jerseyNumber}</p>
+              )}
             </div>
-            <DialogFooter>
-                <Button variant="outline" onClick={() => setIsFormOpen(false)}>Cancel</Button>
-                <Button onClick={handleFormSubmit}>{editingId ? 'Save Changes' : 'Add Player'}</Button>
-            </DialogFooter>
+            <div className="space-y-1.5">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                value={newPlayer.name}
+                onChange={(e) =>
+                  setNewPlayer((p) => ({ ...p, name: e.target.value }))
+                }
+                placeholder="John Doe"
+                className={errors.name ? "border-red-500" : ""}
+              />
+              {errors.name && (
+                <p className="text-red-500 text-xs">{errors.name}</p>
+              )}
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="position">Position</Label>
+              <Select
+                value={newPlayer.position}
+                onValueChange={(v) =>
+                  setNewPlayer((p) => ({ ...p, position: v }))
+                }
+              >
+                <SelectTrigger
+                  id="position"
+                  className={errors.position ? "border-red-500" : ""}
+                >
+                  <SelectValue placeholder="Position" />
+                </SelectTrigger>
+                <SelectContent>
+                  {positions.map((pos) => (
+                    <SelectItem key={pos} value={pos}>
+                      {pos}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.position && (
+                <p className="text-red-500 text-xs">{errors.position}</p>
+              )}
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="year">Year</Label>
+              <Select
+                value={newPlayer.year}
+                onValueChange={(v) => setNewPlayer((p) => ({ ...p, year: v }))}
+              >
+                <SelectTrigger id="year">
+                  <SelectValue placeholder="Year" />
+                </SelectTrigger>
+                <SelectContent>
+                  {years.map((y) => (
+                    <SelectItem key={y} value={y}>
+                      {y}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="rating">Rating</Label>
+              <Input
+                id="rating"
+                value={newPlayer.rating}
+                onChange={(e) =>
+                  setNewPlayer((p) => ({
+                    ...p,
+                    rating: e.target.value.replace(/\D/g, "").slice(0, 2),
+                  }))
+                }
+                placeholder="OVR"
+                className={errors.rating ? "border-red-500" : ""}
+              />
+              {errors.rating && (
+                <p className="text-red-500 text-xs">{errors.rating}</p>
+              )}
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="devTrait">Dev. Trait</Label>
+              <Select
+                value={newPlayer.devTrait}
+                onValueChange={(v) =>
+                  setNewPlayer((p) => ({
+                    ...p,
+                    devTrait: v as Player["devTrait"],
+                  }))
+                }
+              >
+                <SelectTrigger id="devTrait">
+                  <SelectValue placeholder="Trait" />
+                </SelectTrigger>
+                <SelectContent>
+                  {devTraits.map((t) => (
+                    <SelectItem key={t} value={t}>
+                      {t}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5 col-span-1 md:col-span-2">
+              <Label htmlFor="notes">Notes</Label>
+              <Input
+                id="notes"
+                value={newPlayer.notes}
+                onChange={(e) =>
+                  setNewPlayer((p) => ({ ...p, notes: e.target.value }))
+                }
+                placeholder="Optional notes..."
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsFormOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleFormSubmit}>
+              {editingId ? "Save Changes" : "Add Player"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {selectedPlayer && (
-        <PlayerCard player={selectedPlayer} isOpen={isOpen} onClose={closePlayerCard} />
+        <PlayerCard
+          player={selectedPlayer}
+          isOpen={isOpen}
+          onClose={closePlayerCard}
+        />
       )}
     </div>
   );
