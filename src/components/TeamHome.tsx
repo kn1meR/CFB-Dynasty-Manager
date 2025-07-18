@@ -11,7 +11,7 @@ import { TeamLogo, ConferenceLogo } from '@/components/ui/TeamLogo';
 import { 
   getCurrentYear, setSchedule, calculateStats, setYearRecord, 
   getCoachProfile, getPlayers, getPlayerStats, getSchedule,
-  getYearRecord, prepareNextSeason, getRecruits, getTransfers, getYearAwards
+  getYearRecord, prepareNextSeason, getRecruits, getTransfers, getYearAwards, progressRosterForNewSeason
 } from '@/utils/localStorage';
 import { validateYear } from '@/utils/validationUtils';
 import { toast } from 'react-hot-toast';
@@ -270,6 +270,7 @@ const TeamHome: React.FC = () => {
       };
       
       setYearRecord(currentYear, completeFinalRecord);
+      progressRosterForNewSeason(currentYear);
       prepareNextSeason(nextYear);
       saveDynastyData();
       refreshData();
