@@ -24,7 +24,7 @@ const defaultProfileData: CoachProfileType = {
 const defaultYear = 2025;
 
 const CoachProfile = () => {
-  const { currentDynastyId, saveDynastyData } = useDynasty();
+  const { currentDynastyId, saveDynastyData, dataVersion } = useDynasty(); 
   const [profile, setProfile] = useState<CoachProfileType>(defaultProfileData);
   const [displayYear, setDisplayYear] = useState<number>(defaultYear);
   const [isEditing, setIsEditing] = useState(false);
@@ -90,7 +90,9 @@ const CoachProfile = () => {
     };
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
-  }, [currentDynastyId]);
+  
+  // STEP 2: Add dataVersion to the dependency array
+  }, [currentDynastyId, dataVersion]); 
 
   const handleSave = () => {
     try {
