@@ -451,6 +451,106 @@ export const getTeamRankForWeek = (teamName: string, year: number, week: number)
   return rankIndex !== -1 ? rankIndex + 1 : null;
 };
 
+export const progressRosterForNewSeason = (endedYear: number): void => {
+  try {
+    const currentPlayers = getPlayers();
+    const allRecruits = getAllRecruits();
+    const allTransfers = getAllTransfers();
+
+    // 1. Progress the roster: Graduate, Age Up, and Handle Redshirts
+    const progressedPlayers = currentPlayers
+      .map(player => {
+        const isRedshirtedThisSeason = player.isRedshirted;
+        const hasRedshirtHistory = player.year.includes('(RS)');
+        const updatedPlayer = { ...player, isRedshirted: false }; // Reset redshirt status for the new season
+
+        // Graduation Logic: A player graduates if they are a Redshirt Senior, 
+        // OR if they are a regular Senior who was NOT redshirted this season.
+        if (player.year === 'SR (RS)' || (player.year === 'SR' && !isRedshirtedThisSeason)) {
+          return null; // Mark for removal (graduation)
+        }
+
+        let newYear = player.year;
+
+        // --- START OF THE NEW, CORRECTED LOGIC ---
+        if (isRedshirtedThisSeason) {
+          // The player used their redshirt THIS season. Add (RS) to their current year.
+          // This establishes their redshirt history.
+          switch (player.year) {
+            case 'FR': newYear = 'FR (RS)'; break;
+            case 'SO': newYear = 'SO (RS)'; break;
+            case 'JR': newYear = 'JR (RS)'; break;
+            case 'SR': newYear = 'SR (RS)'; break; // The senior redshirt edge case
+          }
+        } else {
+          // The player played this season. Now we advance their class.
+          if (hasRedshirtHistory) {
+            // If they have a redshirt history, they advance to the next redshirt class.
+            switch (player.year) {
+              case 'FR (RS)': newYear = 'SO (RS)'; break;
+              case 'SO (RS)': newYear = 'JR (RS)'; break;
+              case 'JR (RS)': newYear = 'SR (RS)'; break;
+            }
+          } else {
+            // If they have no redshirt history, it's a standard progression.
+            switch (player.year) {
+              case 'FR': newYear = 'SO'; break;
+              case 'SO': newYear = 'JR'; break;
+              case 'JR': newYear = 'SR'; break;
+            }
+          }
+        }
+        // --- END OF THE NEW LOGIC ---
+        
+        updatedPlayer.year = newYear;
+        return updatedPlayer;
+      })
+      .filter((player): player is Player => player !== null); // Filter out the graduated players
+
+    // 2. Add Incoming Recruits (This logic remains the same)
+    const newPlayersFromRecruits = allRecruits
+      .filter(recruit => recruit.recruitedYear === endedYear)
+      .map((recruit, index): Player => ({
+        id: Date.now() + index,
+        name: recruit.name,
+        position: recruit.position,
+        year: 'FR',
+        rating: recruit.rating,
+        jerseyNumber: '',
+        devTrait: recruit.potential as Player['devTrait'],
+        notes: `Recruited in the class of ${endedYear}.`,
+        isRedshirted: false,
+      }));
+
+    // 3. Add Incoming Transfers (This logic remains the same)
+    const newPlayersFromTransfers = allTransfers
+      .filter(transfer => transfer.transferYear === endedYear && transfer.transferDirection === 'From')
+      .map((transfer, index): Player => ({
+        id: Date.now() + 1000 + index,
+        name: transfer.playerName,
+        position: transfer.position,
+        year: 'TR',
+        rating: transfer.stars,
+        jerseyNumber: '',
+        devTrait: 'Normal',
+        notes: `Transferred from ${transfer.school} in ${endedYear}.`,
+        isRedshirted: false,
+      }));
+
+    // 4. Combine and Save the New Roster (This logic remains the same)
+    const newRoster = [...progressedPlayers, ...newPlayersFromRecruits, ...newPlayersFromTransfers];
+    setPlayers(newRoster);
+
+    const returningPlayerNames = new Set(newRoster.map(p => p.name));
+    const allStats = getPlayerStats();
+    const filteredStats = allStats.filter(stat => returningPlayerNames.has(stat.playerName));
+    setPlayerStats(filteredStats);
+
+  } catch (error) {
+    console.error("Error progressing roster for new season:", error);
+  }
+};
+
 export const prepareNextSeason = (year: number): void => {
   try {
     // THIS IS THE FIX: Update the global current year
