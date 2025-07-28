@@ -1,4 +1,4 @@
-// utils/localStorage.ts
+// src/utils/localStorage.ts
 
 // Import types from dedicated files
 import { Recruit, Transfer, Player, DraftedPlayer } from "@/types/playerTypes";
@@ -541,10 +541,8 @@ export const progressRosterForNewSeason = (endedYear: number): void => {
     const newRoster = [...progressedPlayers, ...newPlayersFromRecruits, ...newPlayersFromTransfers];
     setPlayers(newRoster);
 
-    const returningPlayerNames = new Set(newRoster.map(p => p.name));
-    const allStats = getPlayerStats();
-    const filteredStats = allStats.filter(stat => returningPlayerNames.has(stat.playerName));
-    setPlayerStats(filteredStats);
+    // --- FIX: REMOVED THE STATS FILTERING LOGIC ---
+    // The playerStats data will no longer be filtered. It will persist for all players.
 
   } catch (error) {
     console.error("Error progressing roster for new season:", error);
