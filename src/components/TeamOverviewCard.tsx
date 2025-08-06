@@ -22,14 +22,14 @@ const TeamOverviewCard: React.FC<TeamOverviewCardProps> = ({ players, teamName }
   // NEW: Updated calculation function with formula 1.28*x-11.1
   const calculateOverall = (positionPlayers: Player[]) => {
     if (positionPlayers.length === 0) return 0;
-    
+
     // Calculate the average of ALL players in this category
-    const total = positionPlayers.reduce((sum, player) => sum + parseInt(player.rating), 0);
+    const total = positionPlayers.reduce((sum, player) => sum + (parseInt(player.rating) || 0), 0);
     const average = total / positionPlayers.length;
-    
+
     // Apply the new formula: 1.28*x-11.1 (where x = average)
     const calculatedRating = (1.28 * average) - 11.1;
-    
+
     // Round to nearest whole number and ensure it's not negative
     return Math.max(0, Math.round(calculatedRating));
   };
@@ -38,7 +38,7 @@ const TeamOverviewCard: React.FC<TeamOverviewCardProps> = ({ players, teamName }
   const offenseOverall = calculateOverall(offensePlayers);
   const defenseOverall = calculateOverall(defensePlayers);
   const specialTeamsOverall = calculateOverall(specialTeamsPlayers);
-  
+
   // Team overall uses ALL players on the roster
   const teamOverall = calculateOverall(players);
 
