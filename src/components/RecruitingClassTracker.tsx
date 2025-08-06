@@ -11,7 +11,7 @@ import useLocalStorage from '@/hooks/useLocalStorage';
 import { capitalizeName } from '@/utils';
 import { Recruit } from '@/types/playerTypes';
 import { generalPositions } from '@/types/playerTypes';
-import { notifySuccess, notifyError, MESSAGES } from '@/utils/notification-utils';
+import { notifySuccess, MESSAGES } from '@/utils/notification-utils';
 import { Pencil, Trash2 } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './ui/alert-dialog';
 
@@ -19,13 +19,26 @@ interface DevTraitBadgeProps {
   trait: 'Normal' | 'Impact' | 'Star' | 'Elite';
 }
 
+// Data for form dropdowns
 const potentials = ['Elite', 'Star', 'Impact', 'Normal'];
 const starOptions = ['5', '4', '3', '2', '1'];
+const usStates = ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"];
+const stateOptions = [...usStates, 'International'];
 
-// NEW: Function to sort recruits by star rating (5 to 1)
+// This type represents the state of the form, where ranks are strings from input fields.
+type NewRecruitFormState = {
+  name: string;
+  stars: string;
+  position: string;
+  state: string;
+  nationalRank: string;
+  stateRank: string;
+  potential: string;
+};
+
+// Function to sort recruits by star rating, then national rank
 const sortRecruitsByStars = (recruits: Recruit[]): Recruit[] => {
   return [...recruits].sort((a, b) => {
-    // Convert star strings to numbers for comparison
     const starsA = parseInt(a.stars) || 0;
     const starsB = parseInt(b.stars) || 0;
 
@@ -34,27 +47,33 @@ const sortRecruitsByStars = (recruits: Recruit[]): Recruit[] => {
       return starsB - starsA;
     }
 
-    // If stars are equal, sort by rating descending as secondary sort
-    const ratingA = parseInt(a.rating) || 0;
-    const ratingB = parseInt(b.rating) || 0;
-    return ratingB - ratingA;
+    // If stars are equal, sort by national rank ascending (lower is better)
+    // Ranks of null are sorted last
+    const rankA = a.nationalRank ?? 9999;
+    const rankB = b.nationalRank ?? 9999;
+    return rankA - rankB;
   });
 };
 
 const RecruitingClassTracker: React.FC = () => {
   const [currentYear] = useLocalStorage<number>('currentYear', new Date().getFullYear());
   const [allRecruits, setAllRecruits] = useLocalStorage<Recruit[]>('allRecruits', []);
-  const [newRecruit, setNewRecruit] = useState<Omit<Recruit, 'id' | 'recruitedYear'>>({
+
+  const initialFormState: NewRecruitFormState = {
     name: '',
     stars: '',
     position: '',
-    rating: '',
+    state: '',
+    nationalRank: '',
+    stateRank: '',
     potential: ''
-  });
+  };
+
+  const [newRecruit, setNewRecruit] = useState<NewRecruitFormState>(initialFormState);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
 
-  // NEW: Apply star rating sorting to displayed recruits
+  // Apply sorting to displayed recruits
   const recruitsForSelectedYear = sortRecruitsByStars(
     allRecruits.filter(recruit => recruit.recruitedYear === selectedYear)
   );
@@ -74,37 +93,66 @@ const RecruitingClassTracker: React.FC = () => {
     );
   };
 
+  const resetForm = () => {
+    setNewRecruit(initialFormState);
+  };
+
   const addRecruit = () => {
-    const recruitToAdd = {
-      ...newRecruit,
+    const recruitToAdd: Recruit = {
       id: Date.now(),
       recruitedYear: selectedYear,
-      name: capitalizeName(newRecruit.name)
+      name: capitalizeName(newRecruit.name),
+      stars: newRecruit.stars,
+      position: newRecruit.position,
+      state: newRecruit.state,
+      potential: newRecruit.potential,
+      // Convert rank strings to numbers or null if empty
+      nationalRank: newRecruit.nationalRank ? parseInt(newRecruit.nationalRank, 10) : null,
+      stateRank: newRecruit.stateRank ? parseInt(newRecruit.stateRank, 10) : null,
     };
     setAllRecruits([...allRecruits, recruitToAdd]);
-    setNewRecruit({ name: '', stars: '', position: '', rating: '', potential: '' });
+    resetForm();
     notifySuccess(MESSAGES.SAVE_SUCCESS);
   };
 
   const startEditing = (recruit: Recruit) => {
     setEditingId(recruit.id);
-    setNewRecruit(recruit);
+    // Convert numbers back to strings for the form input fields
+    setNewRecruit({
+      name: recruit.name,
+      stars: recruit.stars,
+      position: recruit.position,
+      state: recruit.state,
+      potential: recruit.potential,
+      nationalRank: recruit.nationalRank?.toString() ?? '',
+      stateRank: recruit.stateRank?.toString() ?? '',
+    });
   };
 
   const saveEdit = () => {
-    setAllRecruits(allRecruits.map(recruit =>
-      recruit.id === editingId
-        ? { ...newRecruit, id: recruit.id, recruitedYear: selectedYear, name: capitalizeName(newRecruit.name) }
-        : recruit
-    ));
+    setAllRecruits(allRecruits.map(r => {
+      if (r.id !== editingId) return r;
+      // Create the updated recruit object that matches the Recruit type
+      return {
+        id: r.id,
+        recruitedYear: selectedYear,
+        name: capitalizeName(newRecruit.name),
+        stars: newRecruit.stars,
+        position: newRecruit.position,
+        state: newRecruit.state,
+        potential: newRecruit.potential,
+        nationalRank: newRecruit.nationalRank ? parseInt(newRecruit.nationalRank, 10) : null,
+        stateRank: newRecruit.stateRank ? parseInt(newRecruit.stateRank, 10) : null,
+      };
+    }));
     setEditingId(null);
-    setNewRecruit({ name: '', stars: '', position: '', rating: '', potential: '' });
+    resetForm();
     notifySuccess(MESSAGES.SAVE_SUCCESS);
   };
 
   const cancelEdit = () => {
     setEditingId(null);
-    setNewRecruit({ name: '', stars: '', position: '', rating: '', potential: '' });
+    resetForm();
   };
 
   const removeRecruit = (id: number) => {
@@ -123,11 +171,12 @@ const RecruitingClassTracker: React.FC = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-8 gap-4 mb-4 items-end">
             <Input
               value={newRecruit.name}
               onChange={(e) => setNewRecruit({ ...newRecruit, name: e.target.value })}
               placeholder="Player Name"
+              className="md:col-span-2"
             />
             <Select
               value={newRecruit.stars}
@@ -155,10 +204,30 @@ const RecruitingClassTracker: React.FC = () => {
                 ))}
               </SelectContent>
             </Select>
+            <Select
+              value={newRecruit.state}
+              onValueChange={(value) => setNewRecruit({ ...newRecruit, state: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="State" />
+              </SelectTrigger>
+              <SelectContent>
+                {stateOptions.map(state => (
+                  <SelectItem key={state} value={state}>{state}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Input
-              value={newRecruit.rating}
-              onChange={(e) => setNewRecruit({ ...newRecruit, rating: e.target.value })}
-              placeholder="Rating"
+              value={newRecruit.nationalRank}
+              onChange={(e) => setNewRecruit({ ...newRecruit, nationalRank: e.target.value })}
+              placeholder="Nat. Rank"
+              type="number"
+            />
+            <Input
+              value={newRecruit.stateRank}
+              onChange={(e) => setNewRecruit({ ...newRecruit, stateRank: e.target.value })}
+              placeholder="State Rank"
+              type="number"
             />
             <Select
               value={newRecruit.potential}
@@ -173,14 +242,16 @@ const RecruitingClassTracker: React.FC = () => {
                 ))}
               </SelectContent>
             </Select>
-            {editingId ? (
-              <div className="flex gap-2">
-                <Button onClick={saveEdit} size="sm">Save</Button>
-                <Button onClick={cancelEdit} variant="outline" size="sm">Cancel</Button>
-              </div>
-            ) : (
-              <Button onClick={addRecruit}>Add Recruit</Button>
-            )}
+            <div className="md:col-start-8">
+              {editingId ? (
+                <div className="flex gap-2">
+                  <Button onClick={saveEdit} size="sm">Save</Button>
+                  <Button onClick={cancelEdit} variant="outline" size="sm">Cancel</Button>
+                </div>
+              ) : (
+                <Button onClick={addRecruit} className="w-full">Add Recruit</Button>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -190,7 +261,7 @@ const RecruitingClassTracker: React.FC = () => {
           <div className="flex justify-between items-center">
             <span>Recruiting Class for {selectedYear}</span>
             <div className="text-sm text-gray-600 dark:text-gray-400">
-              Sorted by Star Rating (5★ → 1★)
+              Sorted by Stars, then National Rank
             </div>
           </div>
         </CardHeader>
@@ -201,7 +272,9 @@ const RecruitingClassTracker: React.FC = () => {
                 <th className="text-center">Name</th>
                 <th className="text-center">Stars</th>
                 <th className="text-center">Position</th>
-                <th className="text-center">Rating</th>
+                <th className="text-center">State</th>
+                <th className="text-center">Nat. Rank</th>
+                <th className="text-center">State Rank</th>
                 <th className="text-center">Dev. Trait</th>
                 <th className="text-center">Actions</th>
               </tr>
@@ -212,7 +285,9 @@ const RecruitingClassTracker: React.FC = () => {
                   <td className="text-center">{recruit.name}</td>
                   <td className="text-center">{recruit.stars} ⭐</td>
                   <td className="text-center">{recruit.position}</td>
-                  <td className="text-center">{recruit.rating}</td>
+                  <td className="text-center">{recruit.state}</td>
+                  <td className="text-center">{recruit.nationalRank ?? 'N/A'}</td>
+                  <td className="text-center">{recruit.stateRank ?? 'N/A'}</td>
                   <td className="text-center"><DevTraitBadge trait={recruit.potential as 'Elite' | 'Star' | 'Impact' | 'Normal'} /></td>
                   <td className="text-center">
                     <div className="flex items-center gap-1 justify-center">
