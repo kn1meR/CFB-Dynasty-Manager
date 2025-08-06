@@ -20,14 +20,21 @@ export interface Player {
 }
 
 export interface Recruit {
-    id: number,
+    id: number;
     recruitedYear: number;
     name: string;
     stars: string;
     position: string;
-    rating: string;
     potential: string;
+    state: string; // This was already correct
+    // CHANGED: Ranks are now numbers or null (if not provided)
+    nationalRank: number | null;
+    stateRank: number | null;
+    // REMOVED: The 'rating' field is no longer needed
+    height?: string;
+    weight?: string;
 }
+
 
 export interface Transfer {
     id: number;
@@ -40,11 +47,11 @@ export interface Transfer {
 }
 
 export interface DraftedPlayer {
-  id: string; // Or some unique identifier
-  playerName: string;
-  originalTeam: string; // Team they were drafted from
-  draftedTeam: string;  // NFL team that drafted them
-  round: number;
-  pick: number;
-  year: number; // The year they were drafted
+    id: string; // Or some unique identifier
+    playerName: string;
+    originalTeam: string; // Team they were drafted from
+    draftedTeam: string;  // NFL team that drafted them
+    round: number;
+    pick: number;
+    year: number; // The year they were drafted
 }
