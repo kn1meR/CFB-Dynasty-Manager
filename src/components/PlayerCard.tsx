@@ -5,10 +5,11 @@ import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Trophy } from 'lucide-react';
+import { Trophy, Info, BarChart2, User, StickyNote } from 'lucide-react';
 import { getCoachProfile, getPlayerStats, getAllRecruits, getAllTransfers, getAllYearRecords } from '@/utils/localStorage';
 import { Award } from '@/types/statTypes';
 import { PlayerStat } from '@/types/playerStats';
+import { Recruit, Transfer } from '@/types/playerTypes';
 
 // Extended Player interface to include optional properties that may exist in roster
 interface ExtendedPlayer {
@@ -21,6 +22,8 @@ interface ExtendedPlayer {
   devTrait?: 'Normal' | 'Impact' | 'Star' | 'Elite';
   notes?: string;
   isRedshirted?: boolean;
+  height?: string;
+  weight?: string;
 }
 
 interface PlayerCardProps {
@@ -32,6 +35,10 @@ interface PlayerCardProps {
 interface CareerStats {
   [year: number]: PlayerStat[];
 }
+
+const isRecruit = (obj: any): obj is Recruit => {
+  return obj && typeof obj === 'object' && 'recruitedYear' in obj;
+};
 
 const getDevTraitColor = (trait?: string): string => {
   const colors = {
@@ -57,8 +64,9 @@ const calculateQBR = (stat: Partial<PlayerStat>): number => {
 const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
   const [careerStats, setCareerStats] = useState<CareerStats>({});
   const [playerAwards, setPlayerAwards] = useState<Award[]>([]);
+  // Store the full Recruit or Transfer object
+  const [originInfo, setOriginInfo] = useState<Recruit | Transfer | null>(null);
   const [loading, setLoading] = useState(true);
-  const [recruitingInfo, setRecruitingInfo] = useState<{ year: number; stars: string; type: string } | null>(null);
   const [schoolColors, setSchoolColors] = useState({ primary: '#1e40af', secondary: '#ffffff' });
 
   useEffect(() => {
@@ -77,29 +85,27 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
         }
       });
       setCareerStats(playerStats);
-      
+
       const allYearRecords = getAllYearRecords();
       const awards: Award[] = [];
       allYearRecords.forEach(record => {
-          if (record.playerAwards) {
-              awards.push(...record.playerAwards.filter(award => award.playerName === player.name));
-          }
+        if (record.playerAwards) {
+          awards.push(...record.playerAwards.filter(award => award.playerName === player.name));
+        }
       });
       setPlayerAwards(awards);
 
+      // Fetch and store the full origin object
       const allRecruits = getAllRecruits();
-      let foundRecruitingInfo = null;
       const playerRecruit = allRecruits.find(r => r.name === player.name);
       if (playerRecruit) {
-        foundRecruitingInfo = { year: playerRecruit.recruitedYear, stars: playerRecruit.stars, type: 'Recruited' };
+        setOriginInfo(playerRecruit);
       } else {
         const allTransfers = getAllTransfers();
         const playerTransfer = allTransfers.find(t => t.playerName === player.name && t.transferDirection === 'From');
-        if (playerTransfer) {
-          foundRecruitingInfo = { year: playerTransfer.transferYear, stars: playerTransfer.stars, type: 'Transfer' };
-        }
+        setOriginInfo(playerTransfer || null);
       }
-      setRecruitingInfo(foundRecruitingInfo);
+
     } catch (error) {
       console.error('Error loading player data:', error);
     } finally {
@@ -109,49 +115,86 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
 
   const enhancedPlayer = player;
   const sortedYears = Object.keys(careerStats).map(Number).sort((a, b) => b - a);
-  
+
+  const InfoItem = ({ label, value }: { label: string; value: React.ReactNode }) => (
+    <div className="flex justify-between items-center py-2 border-b border-gray-200 last:border-b-0">
+      <span className="text-sm text-gray-600">{label}</span>
+      <span className="text-sm font-semibold text-gray-900 text-right">{value}</span>
+    </div>
+  );
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-6xl w-full h-[85vh] overflow-hidden p-0 flex flex-col">
         <DialogHeader className="sr-only"><DialogTitle>Player Profile</DialogTitle></DialogHeader>
-        
+
         {loading ? (
           <div className="flex justify-center items-center h-full"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div></div>
         ) : (
           <div className="bg-gradient-to-r from-slate-900 to-slate-800 text-white flex flex-col h-full">
-            <div className="flex items-start gap-4 p-4 flex-shrink-0">
-              <div className="w-20 h-20 rounded-lg flex items-center justify-center text-white text-xl font-bold flex-shrink-0" style={{ backgroundColor: schoolColors.primary }}>
+            {/* === HEADER SECTION (MODIFIED) === */}
+            <div className="flex items-center gap-6 p-4 flex-shrink-0">
+              <div className="w-20 h-20 rounded-lg flex items-center justify-center text-white text-2xl font-bold flex-shrink-0" style={{ backgroundColor: schoolColors.primary }}>
                 {enhancedPlayer.name.split(' ').map(n => n[0]).join('')}
               </div>
               <div className="flex-1 min-w-0">
-                <h1 className="text-2xl font-bold mb-1">{enhancedPlayer.name.toUpperCase()}</h1>
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="text-lg font-semibold">#{enhancedPlayer.jerseyNumber}</span>
-                  <span className="text-lg">{enhancedPlayer.position}</span>
-                  <Badge className={`${getDevTraitColor(enhancedPlayer.devTrait)} text-xs`}>{enhancedPlayer.devTrait || 'Normal'}</Badge>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-sm">
-                  <div><div className="text-gray-400 text-xs">CLASS</div><div className="font-semibold">{enhancedPlayer.year}</div></div>
-                  <div><div className="text-gray-400 text-xs">RATING</div><div className="font-semibold">{enhancedPlayer.rating}</div></div>
-                  {recruitingInfo && (
-                    <>
-                      <div><div className="text-gray-400 text-xs">{recruitingInfo.type.toUpperCase()}</div><div className="font-semibold">{recruitingInfo.year}</div></div>
-                      <div><div className="text-gray-400 text-xs">{recruitingInfo.type.toUpperCase()} STARS</div><div className="font-semibold">{'⭐'.repeat(parseInt(recruitingInfo.stars))}</div></div>
-                    </>
-                  )}
-                  {playerAwards.length > 0 && <div><div className="text-gray-400 text-xs">AWARDS</div><div className="font-semibold">{playerAwards.length}</div></div>}
+                <h1 className="text-3xl font-bold tracking-wider">{enhancedPlayer.name.toUpperCase()}</h1>
+
+                {/* --- NEW HORIZONTAL INFO ROW --- */}
+                <div className="flex items-end gap-x-6 mt-2">
+                  <div>
+                    <div className="text-gray-400 text-xs uppercase">Number</div>
+                    <div className="text-lg font-semibold">#{enhancedPlayer.jerseyNumber}</div>
+                  </div>
+                  <div>
+                    <div className="text-gray-400 text-xs uppercase">Position</div>
+                    <div className="text-lg font-semibold">{enhancedPlayer.position}</div>
+                  </div>
+                  <div>
+                    <div className="text-gray-400 text-xs uppercase">Class</div>
+                    <div className="text-lg font-semibold">{enhancedPlayer.year}</div>
+                  </div>
+                  <div>
+                    <div className="text-gray-400 text-xs uppercase">Rating</div>
+                    <div className="text-lg font-semibold">{enhancedPlayer.rating}</div>
+                  </div>
+                  <div>
+                    <div className="text-gray-400 text-xs uppercase">Dev. Trait</div>
+                    <Badge className={`${getDevTraitColor(enhancedPlayer.devTrait)} text-sm`}>{enhancedPlayer.devTrait || 'Normal'}</Badge>
+                  </div>
                 </div>
               </div>
             </div>
 
             <div className="bg-white text-black flex-1 flex flex-col overflow-hidden">
               <Tabs defaultValue="stats" className="w-full h-full flex flex-col">
-                <TabsList className="w-full rounded-none border-b bg-gray-50 h-10 flex-shrink-0">
-                  <TabsTrigger value="stats" className="flex-1 text-black data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:border-b-2" style={{ borderColor: schoolColors.primary }}>Career Stats</TabsTrigger>
-                  <TabsTrigger value="awards" className="flex-1 text-black data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:border-b-2" style={{ borderColor: schoolColors.primary }}>Awards</TabsTrigger>
-                  <TabsTrigger value="bio" className="flex-1 text-black data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:border-b-2" style={{ borderColor: schoolColors.primary }}>Bio</TabsTrigger>
+                <TabsList
+                  className="w-full rounded-none border-b bg-gray-50 h-10 flex-shrink-0"
+                  style={{ '--school-primary-color': schoolColors.primary } as React.CSSProperties}
+                >
+
+                  {/* === STEP 2: USE CSS VARIABLE IN CHILD === */}
+                  <TabsTrigger
+                    value="stats"
+                    className="flex-1 text-gray-600 rounded-xl transition-colors data-[state=active]:font-semibold data-[state=active]:bg-[--school-primary-color] data-[state=active]:text-white"
+                  >
+                    <BarChart2 className="h-4 w-4 mr-2" />Career Stats
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="awards"
+                    className="flex-1 text-gray-600 rounded-xl transition-colors data-[state=active]:font-semibold data-[state=active]:bg-[--school-primary-color] data-[state=active]:text-white"
+                  >
+                    <Trophy className="h-4 w-4 mr-2" />Awards
+                  </TabsTrigger>
+
+                  <TabsTrigger
+                    value="info"
+                    className="flex-1 text-gray-600 rounded-xl transition-colors data-[state=active]:font-semibold data-[state=active]:bg-[--school-primary-color] data-[state=active]:text-white"
+                  >
+                    <User className="h-4 w-4 mr-2" />Player Info
+                  </TabsTrigger>
                 </TabsList>
-                
+
                 <div className="flex-1 overflow-auto">
                   <TabsContent value="stats" className="mt-0 h-full p-4">
                     {sortedYears.length > 0 ? (
@@ -226,7 +269,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                       <div className="text-center py-12 text-gray-500 h-full flex flex-col justify-center"><Trophy className="h-12 w-12 mx-auto mb-4 opacity-50" /><p>No statistics recorded yet</p></div>
                     )}
                   </TabsContent>
-                  
+
                   <TabsContent value="awards" className="mt-0 h-full p-4">
                     <div className="h-full flex flex-col">
                       {playerAwards.length > 0 ? (
@@ -246,13 +289,55 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                       )}
                     </div>
                   </TabsContent>
-                  
-                  <TabsContent value="bio" className="mt-0 h-full p-4">
-                    <div className="h-full flex flex-col">
-                      <div>
-                        <h4 className="font-semibold text-sm text-gray-600 mb-2">Notes</h4>
-                        {player.notes ? (<p className="text-gray-800 bg-gray-50 p-3 rounded">{player.notes}</p>) : (<p className="text-gray-500 italic">No notes recorded</p>)}
+
+                  <TabsContent value="info" className="mt-0 h-full p-4 bg-gray-50">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                      {/* Recruiting Profile Section */}
+                      <div className="bg-white p-4 rounded-lg border">
+                        <h3 className="font-semibold text-lg mb-3 text-gray-800 border-b pb-2">Recruiting Info</h3>
+                        {originInfo ? (
+                          <>
+                            <InfoItem label="Origin Type" value={<Badge variant="secondary">{isRecruit(originInfo) ? 'Recruit' : 'Transfer'}</Badge>} />
+                            <InfoItem label="Class Year" value={isRecruit(originInfo) ? originInfo.recruitedYear : originInfo.transferYear} />
+                            <InfoItem label="Star Rating" value={'⭐'.repeat(parseInt(originInfo.stars))} />
+                            {isRecruit(originInfo) && (
+                              <>
+                                <InfoItem label="Home State" value={originInfo.state || 'N/A'} />
+                                <InfoItem label="National Rank" value={originInfo.nationalRank ?? 'N/A'} />
+                                <InfoItem label="State Rank" value={originInfo.stateRank ?? 'N/A'} />
+                              </>
+                            )}
+                            {!isRecruit(originInfo) && (
+                              <InfoItem label="Previous School" value={(originInfo as Transfer).school || 'N/A'} />
+                            )}
+                          </>
+                        ) : (
+                          <p className="text-sm text-gray-500 italic">No recruiting or transfer history found.</p>
+                        )}
                       </div>
+
+                      {/* Player Attributes Section */}
+                      <div className="bg-white p-4 rounded-lg border">
+                        <h3 className="font-semibold text-lg mb-3 text-gray-800 border-b pb-2">Player Info</h3>
+                        <InfoItem label="Class" value={player.year} />
+                        <InfoItem label="Redshirted" value={player.isRedshirted ? 'Yes' : 'No'} />
+                        <InfoItem label="Development Trait" value={<Badge className={`${getDevTraitColor(enhancedPlayer.devTrait)} text-xs`}>{enhancedPlayer.devTrait || 'Normal'}</Badge>} />
+                        {/* Optional attributes */}
+                        {/*<InfoItem label="Height" value={player.height || 'N/A'} /> */}
+                        {/*<InfoItem label="Weight" value={player.weight ? `${player.weight} lbs` : 'N/A'} />*/}
+                      </div>
+
+                      {/* Notes Section */}
+                      <div className="bg-white p-4 rounded-lg border md:col-span-2">
+                        <h3 className="font-semibold text-lg mb-3 text-gray-800 border-b pb-2">Coach's Notes</h3>
+                        {player.notes ? (
+                          <p className="text-sm text-gray-800 whitespace-pre-wrap">{player.notes}</p>
+                        ) : (
+                          <p className="text-sm text-gray-500 italic">No notes recorded.</p>
+                        )}
+                      </div>
+
                     </div>
                   </TabsContent>
                 </div>
