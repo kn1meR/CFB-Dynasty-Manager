@@ -43,6 +43,7 @@ export interface Game {
   opponent: string;
   result: 'Win' | 'Loss' | 'Tie' | 'Bye' | 'N/A';
   score: string;
+  isUserControlled?: boolean;
 }
 
 export type AllRecords = {
