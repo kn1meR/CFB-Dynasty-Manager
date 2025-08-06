@@ -13,17 +13,10 @@ import { fcsTeams } from '@/utils/fcsTeams';
 import { AlertCircle, Trophy, TrendingUp, TrendingDown, Minus, Calendar } from 'lucide-react';
 import { CustomTeamManager } from '@/utils/customTeamManager';
 import { useDynasty } from '@/contexts/DynastyContext'; // <-- IMPORT CONTEXT HOOK
+import { Game } from '@/types/yearRecord';
 
-interface Game {
-  id: number;
-  week: number;
-  location: '@' | 'vs' | 'neutral' | ' ';
-  opponent: string;
-  result: 'Win' | 'Loss' | 'Tie' | 'Bye' | 'N/A';
-  score: string;
-}
 
-type UpdateableField = 'location' | 'opponent' | 'result' | 'score';
+type UpdateableField = 'location' | 'opponent' | 'result' | 'score' | 'isUserControlled';
 
 const getWeekDisplayName = (weekNumber: number): string => {
   switch (weekNumber) {
@@ -47,7 +40,7 @@ interface GameRowProps {
 const GameRow = React.memo(({ game, availableTeams, onUpdateGame, getRankForTeam }: GameRowProps) => {
   const [localTeamScore, setLocalTeamScore] = useState('');
   const [localOppScore, setLocalOppScore] = useState('');
-  
+
   // --- USE THE NEW PROP TO GET RANK ---
   const opponentRank = game.opponent ? getRankForTeam(game.opponent, game.week) : null;
   const opponentDisplayName = opponentRank ? `#${opponentRank} ${game.opponent}` : game.opponent;
@@ -71,7 +64,7 @@ const GameRow = React.memo(({ game, availableTeams, onUpdateGame, getRankForTeam
       setLocalOppScore(value);
     }
   };
-  
+
   const handleScoreBlur = () => {
     const newScore = `${localTeamScore}-${localOppScore}`;
     if (newScore !== game.score && (localTeamScore || localOppScore)) {
@@ -99,9 +92,9 @@ const GameRow = React.memo(({ game, availableTeams, onUpdateGame, getRankForTeam
   };
 
   return (
-    <div className="grid grid-cols-12 gap-2 py-2 items-center border-b last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-      <div className="col-span-1 text-sm font-medium">{getWeekDisplayName(game.week)}</div>
-      <div className="col-span-2">
+    <div className="grid gap-2 py-2 items-center border-b last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" style={{ gridTemplateColumns: '1fr 2fr 3fr 1fr 3fr 2fr' }}>
+      <div className="text-sm font-medium">{getWeekDisplayName(game.week)}</div>
+      <div>
         <Select value={game.location} onValueChange={(value) => onUpdateGame(game.week, 'location', value)}>
           <SelectTrigger className="h-8"><SelectValue placeholder="Location" /></SelectTrigger>
           <SelectContent>
@@ -112,53 +105,65 @@ const GameRow = React.memo(({ game, availableTeams, onUpdateGame, getRankForTeam
           </SelectContent>
         </Select>
       </div>
-      <div className="col-span-4">
-         <Select value={game.opponent || 'NONE'} onValueChange={(value) => onUpdateGame(game.week, 'opponent', value)}>
-            <SelectTrigger className="h-8">
-              <SelectValue placeholder="Select opponent">
-                {game.opponent && game.opponent !== 'BYE' && (
-                  <div className="flex items-center gap-2">
-                    <TeamLogo teamName={game.opponent} size="xs" />
-                    <span>{opponentDisplayName}</span>
+      <div>
+        <Select value={game.opponent || 'NONE'} onValueChange={(value) => onUpdateGame(game.week, 'opponent', value)}>
+          <SelectTrigger className="h-8">
+            <SelectValue placeholder="Select opponent">
+              {game.opponent && game.opponent !== 'BYE' && (
+                <div className="flex items-center gap-2">
+                  <TeamLogo teamName={game.opponent} size="xs" />
+                  <span>{opponentDisplayName}</span>
+                </div>
+              )}
+              {game.opponent === 'BYE' && <span>BYE</span>}
+              {!game.opponent && <span>Select opponent</span>}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent className="max-h-60">
+            <SelectItem value="NONE">No Opponent</SelectItem>
+            <SelectItem value="BYE">BYE</SelectItem>
+            {availableTeams.map((team) => {
+              const isCustom = CustomTeamManager.isCustomTeam(team.name);
+              const isFCS = 'isFCS' in team && team.isFCS;
+              return (
+                <SelectItem key={team.name} value={team.name}>
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-2"><TeamLogo teamName={team.name} size="xs" /><span>{team.name}</span></div>
+                    <div className="flex items-center gap-1 ml-2"><ConferenceLogo conference={team.conference} size="xs" /><span className="text-sm text-gray-500">({team.conference}) {isCustom && ' 🎨'}{isFCS && ' (FCS)'}</span></div>
                   </div>
-                )}
-                {game.opponent === 'BYE' && <span>BYE</span>}
-                {!game.opponent && <span>Select opponent</span>}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent className="max-h-60">
-              <SelectItem value="NONE">No Opponent</SelectItem>
-              <SelectItem value="BYE">BYE</SelectItem>
-              {availableTeams.map((team) => {
-                const isCustom = CustomTeamManager.isCustomTeam(team.name);
-                const isFCS = 'isFCS' in team && team.isFCS;
-                return (
-                  <SelectItem key={team.name} value={team.name}>
-                    <div className="flex items-center justify-between w-full">
-                      <div className="flex items-center gap-2"><TeamLogo teamName={team.name} size="xs" /><span>{team.name}</span></div>
-                      <div className="flex items-center gap-1 ml-2"><ConferenceLogo conference={team.conference} size="xs" /><span className="text-sm text-gray-500">({team.conference}) {isCustom && ' 🎨'}{isFCS && ' (FCS)'}</span></div>
-                    </div>
-                  </SelectItem>
-                );
-              })}
-            </SelectContent>
-          </Select>
+                </SelectItem>
+              );
+            })}
+          </SelectContent>
+        </Select>
       </div>
-      <div className="col-span-3">
+      <div className="flex justify-center">
+        <div className="flex flex-col items-center gap-1">
+          <input
+            type="checkbox"
+            checked={game.isUserControlled || false}
+            onChange={(e) => onUpdateGame(game.week, 'isUserControlled', e.target.checked)}
+            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            disabled={!game.opponent || game.opponent === 'BYE'}
+          />
+          <span className="text-xs text-gray-500">User</span>
+        </div>
+      </div>
+      <div>
         <Select value={game.result} onValueChange={(value) => onUpdateGame(game.week, 'result', value)}>
           <SelectTrigger className={`h-8 ${getResultColor(game.result)}`}>
             <SelectValue placeholder="Result"><div className="flex items-center gap-2">{getResultIcon(game.result)}<span>{game.result}</span></div></SelectValue>
           </SelectTrigger>
           <SelectContent>
-             <SelectItem value="Win"><div className="flex items-center gap-2"><Trophy className="w-4 h-4 text-green-600" />Win</div></SelectItem>
-             <SelectItem value="Loss"><div className="flex items-center gap-2"><TrendingDown className="w-4 h-4 text-red-600" />Loss</div></SelectItem>
-             <SelectItem value="Tie"><div className="flex items-center gap-2"><Minus className="w-4 h-4 text-yellow-600" />Tie</div></SelectItem>
-             <SelectItem value="Bye"><div className="flex items-center gap-2"><Calendar className="w-4 h-4 text-gray-500" />Bye</div></SelectItem>
-             <SelectItem value="N/A">Not Played</SelectItem>
+            <SelectItem value="Win"><div className="flex items-center gap-2"><Trophy className="w-4 h-4 text-green-600" />Win</div></SelectItem>
+            <SelectItem value="Loss"><div className="flex items-center gap-2"><TrendingDown className="w-4 h-4 text-red-600" />Loss</div></SelectItem>
+            <SelectItem value="Tie"><div className="flex items-center gap-2"><Minus className="w-4 h-4 text-yellow-600" />Tie</div></SelectItem>
+            <SelectItem value="Bye"><div className="flex items-center gap-2"><Calendar className="w-4 h-4 text-gray-500" />Bye</div></SelectItem>
+            <SelectItem value="N/A">Not Played</SelectItem>
           </SelectContent>
         </Select>
       </div>
-      <div className="col-span-2 flex gap-2">
+      <div className="flex gap-2">
         <Input value={localTeamScore} onChange={(e) => handleScoreInput('team', e.target.value)} onBlur={handleScoreBlur} placeholder="You" className="h-8 text-center w-20" />
         <span className="flex items-center">-</span>
         <Input value={localOppScore} onChange={(e) => handleScoreInput('opp', e.target.value)} onBlur={handleScoreBlur} placeholder="Opp." className="h-8 text-center w-20" />
@@ -178,7 +183,7 @@ const SchedulePage = () => {
 
   // --- GET GLOBAL STATE AND ACTIONS FROM CONTEXT ---
   const { dataVersion, activeWeek, setActiveWeek, getRankingsForWeek } = useDynasty();
-  
+
   const saveScheduleNow = useCallback((scheduleToSave: Game[]) => {
     try {
       setSchedule(currentYear, scheduleToSave);
@@ -213,13 +218,13 @@ const SchedulePage = () => {
     return { home: calculate('vs'), away: calculate('@'), neutral: calculate('neutral') };
   }, [currentSchedule]);
 
-   const debouncedSave = useCallback(() => {
+  const debouncedSave = useCallback(() => {
     if (!hasUnsavedChanges || isSaving) return;
-  
+
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
-  
+
     saveTimeoutRef.current = setTimeout(() => {
       setIsSaving(true);
       // We pass `currentSchedule` directly to avoid stale closure issues
@@ -258,24 +263,24 @@ const SchedulePage = () => {
     return [...allTeams, ...fcsTeamsList].filter(team => team && team.name).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
   }, []);
 
-   useEffect(() => {
+  useEffect(() => {
     const fetchData = () => {
-        const year = getCurrentYear();
-        setYear(year);
-        const profile = getCoachProfile();
-        setTeamName(profile?.schoolName || 'Your Team');
-        const schedule = getSchedule(year);
-        if (schedule.length === 0) {
-          const newSchedule: Game[] = Array.from({ length: 21 }, (_, i) => ({ id: i, week: i, location: 'neutral', opponent: '', result: 'N/A', score: '' }));
-          setSchedule(year, newSchedule);
-          setCurrentSchedule(newSchedule);
-        } else {
-          setCurrentSchedule(schedule);
-        }
+      const year = getCurrentYear();
+      setYear(year);
+      const profile = getCoachProfile();
+      setTeamName(profile?.schoolName || 'Your Team');
+      const schedule = getSchedule(year);
+      if (schedule.length === 0) {
+        const newSchedule: Game[] = Array.from({ length: 21 }, (_, i) => ({ id: i, week: i, location: 'neutral', opponent: '', result: 'N/A', score: '' }));
+        setSchedule(year, newSchedule);
+        setCurrentSchedule(newSchedule);
+      } else {
+        setCurrentSchedule(schedule);
+      }
     };
     fetchData();
   }, [dataVersion]);
-  
+
   // --- NEW FUNCTION TO GET RANK FROM CONTEXT, TO BE PASSED DOWN ---
   const getRankForTeam = useCallback((teamNameToRank: string, week: number) => {
     const rankings = getRankingsForWeek(currentYear, week);
@@ -283,7 +288,7 @@ const SchedulePage = () => {
     return rankIndex !== -1 ? rankIndex + 1 : null;
   }, [currentYear, getRankingsForWeek]);
 
-  
+
 
   const handleUpdateGame = useCallback((week: number, field: UpdateableField, value: any) => {
     setCurrentSchedule(prevSchedule => {
@@ -299,11 +304,11 @@ const SchedulePage = () => {
           gameToUpdate.opponent = 'BYE';
           gameToUpdate.score = '';
         }
-      } 
+      }
       else if (field === 'opponent') {
         gameToUpdate.opponent = value === 'NONE' ? '' : value;
         if (value === 'BYE') {
-            gameToUpdate.score = '';
+          gameToUpdate.score = '';
         }
       }
       else if (field === 'score') {
@@ -313,15 +318,18 @@ const SchedulePage = () => {
           gameToUpdate.result = teamScore > oppScore ? 'Win' : (oppScore > teamScore ? 'Loss' : 'Tie');
         }
       }
+      else if (field === 'isUserControlled') {
+        gameToUpdate.isUserControlled = value;
+      }
       else {
         gameToUpdate[field as 'location'] = value;
       }
-      
+
       updatedSchedule[gameIndex] = gameToUpdate;
 
       const lastCompletedGame = [...updatedSchedule].reverse().find(g => g.result !== 'N/A');
       const newActiveWeek = lastCompletedGame ? Math.min(lastCompletedGame.week + 1, 21) : 0;
-      
+
       if (newActiveWeek !== activeWeek) {
         setActiveWeek(newActiveWeek);
       }
